@@ -1,4 +1,4 @@
-# Dinder Web 
+# Dinder Web
 
 - Create a Vite + React application
 - Remove unecessary code and create a Hello World app
@@ -14,10 +14,17 @@
 - Install axios
 - CORS - install cors in backend => add middleware to with configuration: orgin, credential: true
 - Whenever you're making an API call so pass axios => { withCredential: true }
+- Install Redux Toolkit
+- Install react-redux + @reduxjs/toolkit - https://redux-tootkit.js.orq/tutorials/quick-start
+- configureStore => Provider => createSlice => add reducer to store
+- Add redux devtoots in chrome
+- Login and see if your data is coning property in the store
+- NavBar should update as soon as user logs in
+- Refactor our code to add constants file + create a components folder
 
 Body
-    NavBar
-    Routes/ Feed
-    Route=/login Login
-    Route=/connetions Connections
-    Route=/profile Profile
+NavBar
+Routes/ Feed
+Route=/login Login
+Route=/connetions Connections
+Route=/profile Profile
