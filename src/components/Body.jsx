@@ -18,16 +18,15 @@ const Body = () => {
         const res = await axios.get(BASE_URL + "/profile", {
           withCredentials: true,
         });
-        console.log(res);
         dispatch(addUser(res.data));
-        navigate("/");
+        return navigate("/");
       } catch (err) {
         if (err.status === 401) {
           navigate("/login");
         }
         console.error(err.message);
       }
-    }
+    } else return;
   };
 
   useEffect(() => {
