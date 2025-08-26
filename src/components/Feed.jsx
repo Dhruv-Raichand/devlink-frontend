@@ -25,7 +25,14 @@ const Feed = () => {
     getFeed();
   }, []);
 
-  return <div>{feed && <UserCard user={feed[0]} />}</div>;
+  return (
+    feed && (
+      <div className="flex justify-center">
+        <UserCard user={feed[0]} />
+        {/* <UserCard user={feed[1]} /> */}
+      </div>
+    )
+  );
 };
 
 export default Feed;

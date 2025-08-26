@@ -1,8 +1,14 @@
+import ProfileEdit from "./ProfileEdit";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  return (
-    <div>Profile</div>
-  )
-}
+  const user = useSelector((state) => state.user);
 
-export default Profile
+  return (
+    <div>
+      <ProfileEdit user={user} />
+    </div>
+  );
+};
+
+export default Profile;
