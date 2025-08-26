@@ -6,12 +6,12 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 
 const ProfileEdit = ({ user }) => {
-  const [firstName, setFirstName] = useState(user?.firstName || "");
-  const [lastName, setLastName] = useState(user?.lastName || "");
-  const [about, setAbout] = useState(user?.about || "");
-  const [photoUrl, setPhotoUrl] = useState(user?.photoUrl || "");
-  const [age, setAge] = useState(user?.age || "");
-  const [gender, setGender] = useState(user?.gender || "");
+  const [firstName, setFirstName] = useState(user?.firstName);
+  const [lastName, setLastName] = useState(user?.lastName);
+  const [about, setAbout] = useState(user?.about);
+  const [photoUrl, setPhotoUrl] = useState(user?.photoUrl);
+  const [age, setAge] = useState(user?.age);
+  const [gender, setGender] = useState(user?.gender);
 
   const dispatch = useDispatch();
 

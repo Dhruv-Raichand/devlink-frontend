@@ -5,8 +5,14 @@ const UserCard = ({ user }) => {
         <img src={user?.photoUrl} alt="avatar" />
       </figure>
       <div className="card-body">
-        <h2 className="card-title">{user?.firstName + " " + user?.lastName}</h2>
-        {user?.age && user?.gender && <p>{user?.age + ", " + user?.gender}</p>}
+        <h2 className="card-title">
+          {user?.firstName} {user?.lastName}
+        </h2>
+        {user?.age && user?.gender && (
+          <p>
+            {user?.age}, {user?.gender}
+          </p>
+        )}
         <p>{user?.about}</p>
         <div className="card-actions justify-around">
           <button className="btn btn-primary">Ignore</button>

@@ -5,9 +5,11 @@ const Profile = () => {
   const user = useSelector((state) => state.user);
 
   return (
-    <div>
-      <ProfileEdit user={user} />
-    </div>
+    user && (
+      <div>
+        <ProfileEdit user={user} />
+      </div>
+    )
   );
 };
 
