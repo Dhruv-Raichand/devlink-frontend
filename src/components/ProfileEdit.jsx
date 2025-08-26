@@ -4,6 +4,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { ToastContainer, toast } from "react-toastify";
 
 const ProfileEdit = ({ user }) => {
   const [firstName, setFirstName] = useState(user?.firstName);
@@ -12,6 +13,8 @@ const ProfileEdit = ({ user }) => {
   const [photoUrl, setPhotoUrl] = useState(user?.photoUrl);
   const [age, setAge] = useState(user?.age);
   const [gender, setGender] = useState(user?.gender);
+
+  const notify = (msg) => toast(msg);
 
   const dispatch = useDispatch();
 
@@ -29,14 +32,17 @@ const ProfileEdit = ({ user }) => {
         },
         { withCredentials: true }
       );
+      notify("Profile Updated Successfully !");
       dispatch(addUser(res.data.data));
     } catch (err) {
+      notify(err.response.data);
       console.error(err.message);
     }
   };
 
   return (
     <div className="flex justify-center gap-8">
+      <ToastContainer />
       <div className="card bg-base-300 shadow-sm my-13">
         <div className="card-body flex flex-col justify-center items-center ">
           <h2 className="card-title">Profile Edit</h2>

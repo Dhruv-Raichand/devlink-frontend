@@ -6,6 +6,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 import { useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 
 const Body = () => {
   const userData = useSelector((state) => state.user);
@@ -34,6 +35,7 @@ const Body = () => {
 
   return (
     <>
+      <ToastContainer />
       <NavBar />
       <Outlet />
       <Footer />
