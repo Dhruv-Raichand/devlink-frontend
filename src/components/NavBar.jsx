@@ -4,15 +4,29 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
+import { toast, Flip } from "react-toastify";
 
 const NavBar = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const notify = (msg) =>
+    toast.success(msg, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+      transition: Flip,
+    });
+
   const handleLogout = () => {
     try {
       axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
+      notify("Logged Out Successfully!!!");
       dispatch(removeUser());
       return navigate("/login");
     } catch (err) {
@@ -50,7 +64,10 @@ const NavBar = () => {
                 </Link>
               </li>
               <li>
-                <a>Settings</a>
+                <Link to={"/connections"}>Connections</Link>
+              </li>
+              <li>
+                <Link to={"/requests"}>Requests</Link>
               </li>
               <li>
                 <a onClick={handleLogout}>Logout</a>

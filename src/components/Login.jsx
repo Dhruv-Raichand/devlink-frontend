@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { Flip, ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("jaat@email.com");
@@ -13,7 +13,27 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const notify = (msg) => toast(msg);
+  const notify = (msg) =>
+    toast.success(msg, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "dark",
+      transition: Flip,
+    });
+  const notifyErr = (msg) =>
+    toast.error(msg, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Flip,
+    });
 
   const handleLogin = async () => {
     try {
@@ -29,7 +49,7 @@ const Login = () => {
       dispatch(addUser(res.data));
       return navigate("/");
     } catch (err) {
-      errorNotify(err.response.data);
+      notifyErr(err.response.data);
       setError(err.response.data);
       console.log(err);
     }
@@ -38,7 +58,7 @@ const Login = () => {
   return (
     <>
       <div>
-        <ToastContainer />
+        {error && <ToastContainer />}
         <div className="card bg-base-300 w-96 shadow-sm mx-auto my-20">
           <div className="card-body flex flex-col justify-center items-center ">
             <h2 className="card-title">Login</h2>

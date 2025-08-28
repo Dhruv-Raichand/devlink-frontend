@@ -14,6 +14,8 @@ const ProfileEdit = ({ user }) => {
   const [age, setAge] = useState(user?.age);
   const [gender, setGender] = useState(user?.gender);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const notify = (msg) => toast(msg);
 
   const dispatch = useDispatch();
@@ -68,16 +70,6 @@ const ProfileEdit = ({ user }) => {
               />
             </fieldset>
             <fieldset className="fieldset w-full my-2">
-              <legend className="fieldset-legend">About</legend>
-              <input
-                type="text"
-                className="input"
-                value={about}
-                onChange={(e) => setAbout(e.target.value)}
-                placeholder="Type here"
-              />
-            </fieldset>
-            <fieldset className="fieldset w-full my-2">
               <legend className="fieldset-legend">Photo Url</legend>
               <input
                 type="text"
@@ -97,15 +89,71 @@ const ProfileEdit = ({ user }) => {
                 placeholder="Type here"
               />
             </fieldset>
-            <fieldset className="fieldset w-full my-2">
+            <fieldset className="dropdown dropdown-bottom flex w-full my-2">
               <legend className="fieldset-legend">Gender</legend>
+
+              {/* Read-only input */}
               <input
                 type="text"
-                className="input"
                 value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                placeholder="Type here"
+                readOnly
+                placeholder="Select Your Gender"
+                className="input rounded-r-none border border-gray-500 focus:outline-none focus:ring-0"
               />
+
+              {/* Dropdown */}
+              <div
+                tabIndex={0}
+                role="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="btn rounded-l-none border border-gray-500 focus:outline-none focus:ring-0">
+                Select
+              </div>
+              {isDropdownOpen && (
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGender("male");
+                        setIsDropdownOpen(false);
+                      }}>
+                      Male
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGender("female");
+                        setIsDropdownOpen(false);
+                      }}>
+                      Female
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGender("others");
+                        setIsDropdownOpen(false);
+                      }}>
+                      Others
+                    </button>
+                  </li>
+                </ul>
+              )}
+            </fieldset>
+
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">About</legend>
+              <textarea
+                className="textarea h-24"
+                placeholder="About"
+                value={about}
+                onChange={(e) => setAbout(e.target.value)}></textarea>
             </fieldset>
           </div>
           <div className="card-actions justify-center">
