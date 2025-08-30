@@ -18,6 +18,7 @@ const Requests = () => {
       );
       console.log(res?.data?.data);
       dispatch(removeRequest(res?.data?.data?._id));
+      fetchRequests();
     } catch (err) {
       console.log(err);
     }
