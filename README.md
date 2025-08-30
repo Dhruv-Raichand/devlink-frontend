@@ -29,7 +29,14 @@
 - Edit Profile Feature
 - Show toast message on save of Profile
 - New Page - See all my connections
-- New Page - See all my connection Requests
+- New Page - See all my Connection Requests
+- Feature - Accept/Reject Connection Request
+
+Remaining:
+
+- Send/Ignore the user on feed
+- SignUp New User
+- E2ETesting
 
 Body
 NavBar
