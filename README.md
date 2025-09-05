@@ -33,19 +33,16 @@
 - Feature - Accept/Reject Connection Request
 - Send/Ignore the user on feed
 - SignUp New User
-
-Remaining:
-
 - E2ETesting
 
-Body
-NavBar
-Routes/ Feed
-Route=/login Login
-Route=/connetions Connections
-Route=/profile Profile
+      Body
+      NavBar
+      Routes/ Feed
+      Route=/login Login
+      Route=/connetions Connections
+      Route=/profile Profile
 
-Deploynent
+# Deploynent
 
 - Signup on AWS
 - Launch instance
@@ -70,25 +67,32 @@ Deploynent
   - pm2 list, pm2 flush <name> , pm2 stop <name> , pm2 delete <name>
   - config nginx - /etc/nginx/sites-available/default
 
-Frontend: http://43.204.96.49/
-Backend: http://43.204.96.49:7777/
+# Nginx config :
 
-Domain name: devtinder.com => 43.204.96.49
+        Frontend: http://43.204.96.49/
+        Backend: http://43.204.96.49:7777/
 
-Frontend: devtinder.com
-Backend: devtinder.con:7777 => devtinder.con/api
+        Domain name: devtinder.com => 43.204.96.49
 
-nginx config :
+        Frontend: devtinder.com
+        Backend: devtinder.con:7777 => devtinder.con/api
 
-server_name 43.204.96.49;
+        server_name 43.204.96.49;
 
-location /api/ {
-proxy_pass http://16.171.65.131:3000/;
-
-        # Recommended proxy settings
+        location /api/ {
+        proxy_pass http://16.171.65.131:3000/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
-    }
+        }
+
+# Addding a custom Domain
+
+- purchased dnain nne from godaddy
+- signup on cloudflare & add a new doaain name
+- change the nameservers on godaddy and point it to cloudflare
+- wait for sometime till your nameservers are updated —15 minutes
+- DNS record: A devtinder.in 43.204.96.49
+- Enable SSL for website
