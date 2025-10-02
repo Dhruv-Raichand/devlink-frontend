@@ -99,16 +99,29 @@
 
 # Sending Emails via SES
 
-- Create an IAM user
-- Give Access to AmazonSESFullAcces
-- Amazon SEE: Create an Identity
-- Verify your domain name
-- Verify an email address identity
-- Install AWS SDK - v3
-- Code Example https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/ses#code-examples
-- Setup SesClient
-- Access Credentials should be created in IAM under SecurityCredentials
-- Add the credentials to the env file
-- Write Code for SESClient
-- Write Code for sending email address
-- Make the email dynamic by passing more params to run function
+    - Create an IAM user
+    - Give Access to AmazonSESFullAcces
+    - Amazon SEE: Create an Identity
+    - Verify your domain name
+    - Verify an email address identity
+    - Install AWS SDK - v3
+    - Code Example https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/ses#code-examples
+    - Setup SesClient
+    - Access Credentials should be created in IAM under SecurityCredentials
+    - Add the credentials to the env file
+    - Write Code for SESClient
+    - Write Code for sending email address
+    - Make the email dynamic by passing more params to run function
+
+# Scheduling cron jobs in NodeJS
+
+    - Installing node-cron
+    - Learning about cron expressions syntax - crontab guru
+    - Schedule a job
+    - date-fns
+    - Find all the unique email Id who got connection requeest in previous day
+    - Send Email
+    - Explore queue mechanism to send bulk emails
+    - Amazon SES bulk Email
+    - Make sendEmail function dynamic
+    - bee-queue & bull npm packages
