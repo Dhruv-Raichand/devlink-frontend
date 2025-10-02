@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnection } from "../utils/connectionSlice";
+import { Link } from "react-router-dom";
 
 const Connections = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ const Connections = () => {
       dispatch(addConnection(res?.data?.data));
     } catch (err) {
       console.error("Error fetching connections:", err);
-      setError("Failed to load connections. Please try again.");
+      setError(err?.response?.dat);
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ const Connections = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
-          <div className="text-error text-6xl mb-4">💔</div>
+          <div className="text-error text-6xl mb-4">⛓️‍💥</div>
           <h2 className="text-2xl font-bold mb-2 text-error">Oops!</h2>
           <p className="text-base-content/70 mb-4">{error}</p>
           <button className="btn btn-primary" onClick={getConnections}>
@@ -59,13 +60,15 @@ const Connections = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-6">🔗</div>
+          <div className="text-6xl mb-6">⛓️‍💥</div>
           <h1 className="text-3xl font-bold mb-4">No Connections Yet</h1>
           <p className="text-base-content/70 mb-6">
             Start swiping to find your perfect matches and build meaningful
             connections!
           </p>
-          <button className="btn btn-primary btn-lg">Start Swiping</button>
+          <Link to={"/"} className="btn btn-primary btn-lg">
+            Start Swiping
+          </Link>
         </div>
       </div>
     );
