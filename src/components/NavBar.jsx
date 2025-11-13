@@ -40,7 +40,10 @@ const NavBar = () => {
         <Link
           to="/"
           className="text-xl sm:text-2xl font-bold hover:text-primary transition-all duration-300">
-          🧑‍💻 DevLink
+          <div className="flex gap-2 items-center">
+            <img src="/devlink.png" alt="" className="w-10" />
+            DevLink
+          </div>
         </Link>
       </div>
 

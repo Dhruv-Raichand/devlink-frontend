@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { Flip, ToastContainer, toast } from "react-toastify";
+import { Flip, toast } from "react-toastify";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -57,8 +57,8 @@ const Login = () => {
       dispatch(addUser(res.data.data));
       return navigate("/profile");
     } catch (err) {
-      notifyErr(err.response.data);
-      setError(err.response.data);
+      notifyErr(err?.response?.data?.message);
+      setError(err?.response?.data?.message);
       console.log(err);
     } finally {
       setIsLoading(false);
@@ -90,8 +90,6 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center p-4 min-h-[calc(100vh-200px)]">
-      <ToastContainer />
-
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">

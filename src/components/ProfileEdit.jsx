@@ -317,17 +317,19 @@ const ProfileEdit = ({ user }) => {
               </p>
             </div>
 
-            <UserCard
-              user={{
-                firstName,
-                lastName,
-                about,
-                photoUrl: previewImage,
-                age,
-                gender,
-                _id: user?._id,
-              }}
-            />
+            <div className="flex justify-center p-6 items-center">
+              <UserCard
+                user={{
+                  firstName,
+                  lastName,
+                  about,
+                  photoUrl: previewImage,
+                  age,
+                  gender,
+                  _id: user?._id,
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

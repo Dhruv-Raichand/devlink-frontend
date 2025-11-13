@@ -57,6 +57,7 @@
   - sudo apt install nginx
   - sudo apt enable nginx
   - Copy code from the dist(buid files) to /var/www/html/
+  - sudo scp -r dist/\* /var/www/html/
   - Enable port 80 on your instance
 - Backend
   - updated DB password
@@ -125,3 +126,9 @@
     - Amazon SES bulk Email
     - Make sendEmail function dynamic
     - bee-queue & bull npm packages
+
+# Real Time Chat using Websocket(Socket.io)
+
+    - Build the UI for chat window on /chat/:targetUserId
+    - Setup Socket.io in backend
+    - npm i socket.io

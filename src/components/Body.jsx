@@ -6,7 +6,8 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 import { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, Flip } from "react-toastify";
+import Silk from "./Silk";
 
 const Body = () => {
   const userData = useSelector((state) => state.user);
@@ -49,7 +50,6 @@ const Body = () => {
         <NavBar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
-            {/* Enhanced Loading Animation */}
             <div className="relative w-16 h-16 mx-auto mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-blue-200 dark:border-blue-800"></div>
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 animate-spin"></div>
@@ -73,7 +73,6 @@ const Body = () => {
         <NavBar />
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="text-center max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
-            {/* Error Icon */}
             <div className="w-20 h-20 mx-auto mb-6 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
               <svg
                 className="w-10 h-10 text-red-600 dark:text-red-400"
@@ -123,55 +122,58 @@ const Body = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
-      {/* Global Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        className="z-[9999]"
-      />
+    <div className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
+      {/* ✅ Silk background permanently behind all content */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Silk
+          speed={5}
+          scale={1}
+          color="#5227ff"
+          noiseIntensity={1.5}
+          rotation={0}
+        />
+      </div>
 
-      {/* Navigation */}
-      <NavBar />
+      {/* ✅ All content sits above Silk */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Toasts */}
+        {/* <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          draggable
+          pauseOnHover
+          theme="dark"
+          className="z-[9999]"
+        /> */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          transition={Flip}
+        />
 
-      {/* Main Content Area */}
-      <main className="flex-1 relative">
-        {/* Content with proper spacing and responsive container */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-full">
-          <div className="max-w-7xl mx-auto">
-            <Outlet />
+        <NavBar />
+
+        <main className="flex-1">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-full">
+            <div className="max-w-7xl mx-auto">
+              <Outlet />
+            </div>
           </div>
-        </div>
+        </main>
 
-        {/* Enhanced Background Decorations */}
-        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-          {/* Animated Gradient Orbs */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-full">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-pink-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-          </div>
-
-          {/* Subtle Pattern Overlay */}
-          <div
-            className="absolute inset-0 opacity-5 dark:opacity-10"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.3) 1px, transparent 0)`,
-              backgroundSize: "50px 50px",
-            }}></div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 };

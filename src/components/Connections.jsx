@@ -88,15 +88,14 @@ const Connections = () => {
       </div>
 
       {/* Connections Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
         {connections.map((connection) => {
           const { _id, firstName, lastName, photoUrl, age, gender, about } =
             connection;
-
           return (
             <div
               key={_id}
-              className="bg-base-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
+              className="relative bg-base-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] flex flex-col">
               {/* Profile Image */}
               <div className="relative">
                 <img
@@ -116,7 +115,7 @@ const Connections = () => {
               </div>
 
               {/* Profile Info */}
-              <div className="p-4">
+              <div className="p-4 flex flex-col flex-1">
                 <h2 className="text-xl font-bold mb-2 truncate">
                   {firstName} {lastName}
                 </h2>
@@ -134,11 +133,14 @@ const Connections = () => {
                   </p>
                 )}
 
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <button className="btn btn-primary btn-sm flex-1">
+                {/* Action Buttons pinned to bottom */}
+                <div className="flex gap-2 mt-auto">
+                  <Link
+                    to={"/chat/" + _id}
+                    state={{ targetUser: connection }}
+                    className="btn btn-primary btn-sm flex-1">
                     Message
-                  </button>
+                  </Link>
                   <button className="btn btn-ghost btn-sm">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
