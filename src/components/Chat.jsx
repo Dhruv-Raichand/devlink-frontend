@@ -36,6 +36,7 @@ const Chat = () => {
         lastName: msg.senderId.lastName,
         photoUrl: msg.senderId.photoUrl,
         text: msg.text,
+        createdAt: msg.createdAt,
       };
     });
     setMessages(chatMessages);
@@ -89,6 +90,14 @@ const Chat = () => {
     }
   };
 
+  const formatMessageTime = (date) => {
+    return new Date(date).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
     <div className="w-[80vw] backdrop-blur-md bg-black/10 border mx-auto border-gray-600 rounded-2xl m-5 h-[80vh] flex flex-col">
       <div className="flex gap-5 items-center px-5 py-3 border-b border-gray-600">
@@ -132,7 +141,9 @@ const Chat = () => {
                   {msg.firstName === user.firstName
                     ? "You"
                     : `${msg.firstName} ${msg.lastName}`}
-                  <time className="text-xs opacity-50">12:45</time>
+                  <time className="text-xs opacity-50">
+                    {formatMessageTime(msg?.createdAt)}
+                  </time>
                 </div>
                 <div className="chat-bubble">{msg.text}</div>
                 <div className="chat-footer opacity-50">Delivered</div>
