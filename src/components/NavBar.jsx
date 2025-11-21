@@ -210,6 +210,8 @@ const NavBar = () => {
                   </li>
                   <li className="mt-2 pt-2 border-t border-base-300">
                     <a
+                      href="#"
+                      role="button"
                       onClick={handleLogout}
                       className="text-error hover:bg-error hover:text-error-content cursor-pointer">
                       Logout
