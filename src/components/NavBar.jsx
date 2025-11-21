@@ -132,6 +132,8 @@ const NavBar = () => {
                 </li>
                 <li>
                   <a
+                    href="#"
+                    role="button"
                     onClick={handleLogout}
                     className="text-error hover:bg-error hover:text-error-content">
                     Logout
