@@ -326,7 +326,6 @@ const ProfileEdit = ({ user }) => {
                   photoUrl: previewImage,
                   age,
                   gender,
-                  _id: user?._id,
                 }}
               />
             </div>
