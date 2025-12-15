@@ -1,17 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { visualizer } from "rollup-plugin-visualizer";
 
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    process.env.ANALYZE &&
+export default defineConfig(async () => {
+  const plugins = [react(), tailwindcss()];
+
+  if (process.env.ANALYZE) {
+    const { visualizer } = await import("rollup-plugin-visualizer");
+    plugins.push(
       visualizer({
-        open: false, // IMPORTANT for EC2
+        open: false, // EC2 safe
         gzipSize: true,
         brotliSize: true,
-      }),
-  ].filter(Boolean),
+      })
+    );
+  }
+
+  return { plugins };
 });
