@@ -11,7 +11,8 @@ const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((state) => state.request);
   const { setSilkColor } = useSilk(); // <-- get the setter
-  const { setLoading: setGlobalLoading } = useLoading();
+  const { setLoading: setGlobalLoading, setError: setGlobalError } =
+    useLoading();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,6 +21,7 @@ const Requests = () => {
       setLoading(true);
       setGlobalLoading(true);
       setError(null);
+      setGlobalError(false);
 
       const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
@@ -33,6 +35,7 @@ const Requests = () => {
       setError(
         err?.response?.data?.message || err?.message || "Something went wrong"
       );
+      setGlobalError(true);
     } finally {
       setLoading(false);
       setGlobalLoading(false);

@@ -11,7 +11,8 @@ const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((state) => state.connection);
   const { setSilkColor } = useSilk(); // <-- get the setter
-  const { setLoading: setGlobalLoading } = useLoading();
+  const { setLoading: setGlobalLoading, setError: setGlobalError } =
+    useLoading();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,6 +21,7 @@ const Connections = () => {
       setLoading(true);
       setGlobalLoading(true);
       setError(null);
+      setGlobalError(false);
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
@@ -28,6 +30,7 @@ const Connections = () => {
     } catch (err) {
       console.error("Error fetching connections:", err);
       setError(err?.response?.data);
+      setGlobalError(true);
     } finally {
       setLoading(false);
       setGlobalLoading(false);

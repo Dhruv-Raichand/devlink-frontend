@@ -4,10 +4,15 @@ import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import SwipeableCard from "./SwipeableCard";
+import { useSilk } from "../context/SilkContext";
+import { useLoading } from "../context/LoadingContext";
 
 const Feed = () => {
   const feed = useSelector((state) => state.feed);
   const dispatch = useDispatch();
+  const { setSlikColor } = useSilk();
+  const { setLoading: setGlobalLoading, setError: setGlobalError } =
+    useLoading();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -15,7 +20,9 @@ const Feed = () => {
   const getFeed = async () => {
     try {
       setLoading(true);
+      setGlobalLoading(true);
       setError(null);
+      setGlobalError(false);
       const res = await axios.get(BASE_URL + "/feed", {
         withCredentials: true,
       });
@@ -24,8 +31,10 @@ const Feed = () => {
     } catch (err) {
       console.error("Error fetching feed:", err);
       setError("Failed to load feed. Please try again.");
+      setGlobalError(true);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
 

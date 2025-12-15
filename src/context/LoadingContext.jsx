@@ -11,8 +11,10 @@ export const useLoading = () => {
 
 export const LoadingProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   return (
-    <LoadingContext.Provider value={{ loading, setLoading }}>
+    <LoadingContext.Provider value={{ loading, setLoading, error, setError }}>
       {children}
     </LoadingContext.Provider>
   );
