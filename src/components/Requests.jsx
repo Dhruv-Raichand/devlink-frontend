@@ -24,7 +24,10 @@ const Requests = () => {
       dispatch(addRequest(res?.data?.data || null));
     } catch (err) {
       console.error("Error fetching requests:", err);
-      setError(err?.response?.data || "Failed to load requests");
+
+      setError(
+        err?.response?.data?.message || err?.message || "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
