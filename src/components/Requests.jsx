@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
-import { addConnection } from "../utils/connectionSlice";
+import { addRequest } from "../utils/requestSlice";
 import { Link } from "react-router-dom";
 
 const Requests = () => {
@@ -21,7 +21,7 @@ const Requests = () => {
       });
 
       console.log(res?.data?.data);
-      dispatch(addConnection(res?.data?.data || []));
+      dispatch(addConnection(res?.data?.data || null));
     } catch (err) {
       console.error("Error fetching requests:", err);
       setError(err?.response?.data || "Failed to load requests");
