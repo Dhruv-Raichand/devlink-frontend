@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ToastContainer, Flip } from "react-toastify";
 import { lazy, Suspense } from "react";
 const Silk = lazy(() => import("./Silk"));
@@ -19,7 +19,8 @@ const Body = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { pageColor } = useSilk();
+  const { pageColor, setPageColor } = useSilk();
+  const silkContainerRef = useRef(null);
   const {
     loading: pageLoading,
     setLoading: setGlobalLoading,
@@ -61,9 +62,9 @@ const Body = () => {
 
   // Determine Silk color based on state
   const getSilkColor = () => {
-    if (pageError) return "#ef4444"; // red always wins
-    if (pageLoading) return "#3b82f6"; // blue while ANY page loads
-    return pageColor; // page-specific color
+    if (pageError || error) return "#ef4444"; // red
+    if (pageLoading || loading) return "#3b82f6"; // blue while loading
+    return pageColor || "#5227ff"; // page-specific OR default purple
   };
 
   const SilkFallback = ({ color }) => (
@@ -82,9 +83,12 @@ const Body = () => {
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
       {/* Silk with dynamic color - animation won't pause now! */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div
+        ref={silkContainerRef}
+        className="absolute inset-0 z-0 pointer-events-none">
         <Suspense fallback={<SilkFallback color={getSilkColor()} />}>
           <Silk
+            container={silkContainerRef.current} // THIS is critical
             key="main-silk"
             speed={5}
             scale={1}

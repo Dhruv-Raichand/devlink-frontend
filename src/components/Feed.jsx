@@ -10,7 +10,7 @@ import { useLoading } from "../context/LoadingContext";
 const Feed = () => {
   const feed = useSelector((state) => state.feed);
   const dispatch = useDispatch();
-  const { setSlikColor } = useSilk();
+  const { setPageColor } = useSilk();
   const { setLoading: setGlobalLoading, setError: setGlobalError } =
     useLoading();
   const [loading, setLoading] = useState(true);
@@ -55,6 +55,11 @@ const Feed = () => {
       setIsProcessing(false);
     }
   };
+
+  useEffect(() => {
+    setPageColor("#5227ff"); // purple
+    return () => setPageColor(null);
+  }, []);
 
   useEffect(() => {
     getFeed();

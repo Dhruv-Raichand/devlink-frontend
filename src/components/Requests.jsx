@@ -10,7 +10,7 @@ import { useLoading } from "../context/LoadingContext";
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((state) => state.request);
-  const { setSilkColor } = useSilk(); // <-- get the setter
+  const { setPageColor } = useSilk(); // <-- get the setter
   const { setLoading: setGlobalLoading, setError: setGlobalError } =
     useLoading();
   const [loading, setLoading] = useState(true);
@@ -43,10 +43,10 @@ const Requests = () => {
   };
 
   useEffect(() => {
-    setSilkColor("#22c55e"); // green for Requests page
+    setPageColor("#22c55e"); // green for Requests page
     getRequests();
     // optional: reset to default when unmounting
-    return () => setSilkColor("#5227ff");
+    return () => setPageColor("#5227ff");
   }, []);
 
   if (loading) {

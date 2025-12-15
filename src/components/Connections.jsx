@@ -10,7 +10,7 @@ import { useLoading } from "../context/LoadingContext";
 const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((state) => state.connection);
-  const { setSilkColor } = useSilk(); // <-- get the setter
+  const { setPageColor } = useSilk(); // <-- get the setter
   const { setLoading: setGlobalLoading, setError: setGlobalError } =
     useLoading();
   const [loading, setLoading] = useState(true);
@@ -38,9 +38,8 @@ const Connections = () => {
   };
 
   useEffect(() => {
-    setSilkColor("#f59e0b"); // Amber for Connections page
-    getConnections();
-    return () => setSilkColor("#5227ff"); // reset default on leave
+    setPageColor("#f59e0b"); // amber
+    return () => setPageColor(null);
   }, []);
 
   if (loading) {
