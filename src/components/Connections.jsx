@@ -4,16 +4,21 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnection } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
+import { useSilk } from "../context/SilkContext";
+import { useLoading } from "../context/LoadingContext";
 
 const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((state) => state.connection);
+  const { setSilkColor } = useSilk(); // <-- get the setter
+  const { setLoading: setGlobalLoading } = useLoading();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const getConnections = async () => {
     try {
       setLoading(true);
+      setGlobalLoading(true);
       setError(null);
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
@@ -25,18 +30,23 @@ const Connections = () => {
       setError(err?.response?.data);
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
 
   useEffect(() => {
+    setSilkColor("#f59e0b"); // Amber for Connections page
     getConnections();
+    return () => setSilkColor("#5227ff"); // reset default on leave
   }, []);
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="loading loading-spinner loading-lg text-blue-600 dark:text-blue-400 mb-4"></div>
-        <p className="text-lg text-gray-900 dark:text-white">Loading your connections...</p>
+        <p className="text-lg text-gray-900 dark:text-white">
+          Loading your connections...
+        </p>
       </div>
     );
   }
@@ -46,9 +56,13 @@ const Connections = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">⛔️💥</div>
-          <h2 className="text-2xl font-bold mb-2 text-red-600 dark:text-red-400">Oops!</h2>
+          <h2 className="text-2xl font-bold mb-2 text-red-600 dark:text-red-400">
+            Oops!
+          </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg" onClick={getConnections}>
+          <button
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
+            onClick={getConnections}>
             Try Again
           </button>
         </div>
@@ -61,12 +75,16 @@ const Connections = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-6">⛓️💥</div>
-          <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">No Connections Yet</h1>
+          <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            No Connections Yet
+          </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Start swiping to find your perfect matches and build meaningful
             connections!
           </p>
-          <Link to={"/"} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg inline-block">
+          <Link
+            to={"/"}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg inline-block">
             Start Swiping
           </Link>
         </div>
@@ -122,8 +140,12 @@ const Connections = () => {
 
                 {age && gender && (
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full">{age} years old</div>
-                    <div className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full">{gender}</div>
+                    <div className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full">
+                      {age} years old
+                    </div>
+                    <div className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full">
+                      {gender}
+                    </div>
                   </div>
                 )}
 

@@ -4,16 +4,21 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequest } from "../utils/requestSlice";
 import { Link } from "react-router-dom";
+import { useSilk } from "../context/SilkContext";
+import { useLoading } from "../context/LoadingContext";
 
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((state) => state.request);
+  const { setSilkColor } = useSilk(); // <-- get the setter
+  const { setLoading: setGlobalLoading } = useLoading();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const getRequests = async () => {
     try {
       setLoading(true);
+      setGlobalLoading(true);
       setError(null);
 
       const res = await axios.get(BASE_URL + "/user/requests/received", {
@@ -30,11 +35,15 @@ const Requests = () => {
       );
     } finally {
       setLoading(false);
+      setGlobalLoading(false);
     }
   };
 
   useEffect(() => {
+    setSilkColor("#22c55e"); // green for Requests page
     getRequests();
+    // optional: reset to default when unmounting
+    return () => setSilkColor("#5227ff");
   }, []);
 
   if (loading) {
