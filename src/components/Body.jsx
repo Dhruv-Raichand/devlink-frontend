@@ -1,6 +1,3 @@
-if (!navigator.connection?.saveData) {
-  import("./Silk");
-}
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { Outlet, useNavigate } from "react-router-dom";
