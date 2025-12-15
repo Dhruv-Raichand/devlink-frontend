@@ -9,7 +9,7 @@ import { Flip, toast } from "react-toastify";
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogging, setIsLogging] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
@@ -57,8 +57,8 @@ const Login = () => {
       dispatch(addUser(res.data.data));
       return navigate("/profile");
     } catch (err) {
-      notifyErr(err?.response?.data?.message);
-      setError(err?.response?.data?.message);
+      notifyErr(err?.response?.data?.message || "Registration failed");
+      setError(err?.response?.data?.message || "Registration failed");
       console.log(err);
     } finally {
       setIsLoading(false);
@@ -80,8 +80,8 @@ const Login = () => {
       dispatch(addUser(res.data));
       return navigate("/");
     } catch (err) {
-      notifyErr(err.response.data);
-      setError(err.response.data);
+      notifyErr(err?.response?.data?.message || "Login failed");
+      setError(err?.response?.data?.message || "Login failed");
       console.log(err);
     } finally {
       setIsLoading(false);
@@ -93,38 +93,40 @@ const Login = () => {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Welcome Back
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
+            {isLoginMode ? "Welcome Back" : "Join DevLink"}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {isLogging ? "Sign in to your account" : "Create your new account"}
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
+            {isLoginMode
+              ? "Sign in to your account"
+              : "Create your new account"}
           </p>
         </div>
 
         {/* Main Card */}
-        <div className="bg-white dark:bg-gray-800 backdrop-blur-lg bg-opacity-90 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Tab Selector */}
-          <div className="flex bg-gray-50 dark:bg-gray-700">
+          <div className="flex bg-gray-100 dark:bg-gray-700/50">
             <button
               className={`flex-1 py-4 text-sm font-semibold transition-all duration-300 ${
-                isLogging
+                isLoginMode
                   ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
               onClick={() => {
-                setIsLogging(true);
+                setIsLoginMode(true);
                 setError("");
               }}>
               Sign In
             </button>
             <button
               className={`flex-1 py-4 text-sm font-semibold transition-all duration-300 ${
-                !isLogging
+                !isLoginMode
                   ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
               onClick={() => {
-                setIsLogging(false);
+                setIsLoginMode(false);
                 setError("");
               }}>
               Sign Up
@@ -135,7 +137,7 @@ const Login = () => {
           <div className="p-6 sm:p-8">
             <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
               {/* Name Fields for Sign Up */}
-              {!isLogging && (
+              {!isLoginMode && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -146,7 +148,7 @@ const Login = () => {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="John"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
                       required
                     />
                   </div>
@@ -159,7 +161,7 @@ const Login = () => {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Doe"
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
                       required
                     />
                   </div>
@@ -176,7 +178,7 @@ const Login = () => {
                   value={emailId}
                   onChange={(e) => setEmailId(e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
                   required
                 />
               </div>
@@ -191,22 +193,33 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200"
                   required
                 />
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
-                  {error}
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 flex-shrink-0"
+                    viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>{error}</span>
                 </div>
               )}
 
               {/* Submit Button */}
               <button
                 type="submit"
-                onClick={isLogging ? handleLogin : handleSignUp}
+                onClick={isLoginMode ? handleLogin : handleSignUp}
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg">
                 {isLoading ? (
@@ -214,7 +227,7 @@ const Login = () => {
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                     <span>Processing...</span>
                   </div>
-                ) : isLogging ? (
+                ) : isLoginMode ? (
                   "Sign In"
                 ) : (
                   "Create Account"
@@ -226,11 +239,11 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setIsLogging(!isLogging);
+                    setIsLoginMode(!isLoginMode);
                     setError("");
                   }}
                   className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors duration-200">
-                  {isLogging
+                  {isLoginMode
                     ? "Don't have an account? Sign up"
                     : "Already have an account? Sign in"}
                 </button>

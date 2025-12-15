@@ -1,5 +1,6 @@
-import Silk from "./Silk";
 import { useNavigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+const Silk = lazy(() => import("./Silk"));
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -8,7 +9,9 @@ const NotFound = () => {
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-orange-50 to-pink-50 dark:from-gray-900 dark:via-red-900 dark:to-orange-900 overflow-hidden">
       {/* Background Silk */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
-        <Silk speed={5} scale={1} color="#ff274b" noiseIntensity={1.8} />
+        <Suspense fallback={<div>Loading BG...</div>}>
+          <Silk speed={5} scale={1} color="#ff274b" noiseIntensity={1.8} />
+        </Suspense>
       </div>
 
       {/* Content */}

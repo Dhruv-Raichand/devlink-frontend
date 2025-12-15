@@ -22,7 +22,7 @@ const Connections = () => {
       dispatch(addConnection(res?.data?.data));
     } catch (err) {
       console.error("Error fetching connections:", err);
-      setError(err?.response?.dat);
+      setError(err?.response?.data);
     } finally {
       setLoading(false);
     }
@@ -35,8 +35,8 @@ const Connections = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
-        <p className="text-lg">Loading your connections...</p>
+        <div className="loading loading-spinner loading-lg text-blue-600 dark:text-blue-400 mb-4"></div>
+        <p className="text-lg text-gray-900 dark:text-white">Loading your connections...</p>
       </div>
     );
   }
@@ -45,10 +45,10 @@ const Connections = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
-          <div className="text-error text-6xl mb-4">⛓️‍💥</div>
-          <h2 className="text-2xl font-bold mb-2 text-error">Oops!</h2>
-          <p className="text-base-content/70 mb-4">{error}</p>
-          <button className="btn btn-primary" onClick={getConnections}>
+          <div className="text-6xl mb-4">⛔️💥</div>
+          <h2 className="text-2xl font-bold mb-2 text-red-600 dark:text-red-400">Oops!</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg" onClick={getConnections}>
             Try Again
           </button>
         </div>
@@ -60,13 +60,13 @@ const Connections = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-6">⛓️‍💥</div>
-          <h1 className="text-3xl font-bold mb-4">No Connections Yet</h1>
-          <p className="text-base-content/70 mb-6">
+          <div className="text-6xl mb-6">⛓️💥</div>
+          <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">No Connections Yet</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Start swiping to find your perfect matches and build meaningful
             connections!
           </p>
-          <Link to={"/"} className="btn btn-primary btn-lg">
+          <Link to={"/"} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg inline-block">
             Start Swiping
           </Link>
         </div>
@@ -78,10 +78,10 @@ const Connections = () => {
     <div className="py-6 sm:py-8 lg:py-12">
       {/* Header Section */}
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
           Your Connections 🔗
         </h1>
-        <p className="text-base-content/70 text-lg">
+        <p className="text-gray-600 dark:text-gray-400 text-lg">
           {connections.length}{" "}
           {connections.length === 1 ? "connection" : "connections"} found
         </p>
@@ -95,7 +95,7 @@ const Connections = () => {
           return (
             <div
               key={_id}
-              className="relative bg-base-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] flex flex-col">
+              className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] flex flex-col">
               {/* Profile Image */}
               <div className="relative">
                 <img
@@ -108,7 +108,7 @@ const Connections = () => {
                   }}
                 />
                 <div className="absolute top-3 right-3">
-                  <div className="badge badge-success badge-lg font-semibold shadow-lg">
+                  <div className="bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                     Connected
                   </div>
                 </div>
@@ -116,19 +116,19 @@ const Connections = () => {
 
               {/* Profile Info */}
               <div className="p-4 flex flex-col flex-1">
-                <h2 className="text-xl font-bold mb-2 truncate">
+                <h2 className="text-xl font-bold mb-2 truncate text-gray-900 dark:text-white">
                   {firstName} {lastName}
                 </h2>
 
                 {age && gender && (
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="badge badge-outline">{age} years old</div>
-                    <div className="badge badge-outline">{gender}</div>
+                    <div className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full">{age} years old</div>
+                    <div className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full">{gender}</div>
                   </div>
                 )}
 
                 {about && (
-                  <p className="text-base-content/70 text-sm line-clamp-3 mb-4">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4">
                     {about}
                   </p>
                 )}
@@ -138,10 +138,10 @@ const Connections = () => {
                   <Link
                     to={"/chat/" + _id}
                     state={{ targetUser: connection }}
-                    className="btn btn-primary btn-sm flex-1">
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 text-sm flex-1 text-center">
                     Message
                   </Link>
-                  <button className="btn btn-ghost btn-sm">
+                  <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-all duration-200">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4"
@@ -166,7 +166,7 @@ const Connections = () => {
       {/* Load More Button (if needed for pagination) */}
       {connections.length > 0 && (
         <div className="text-center mt-12">
-          <button className="btn btn-outline btn-lg">
+          <button className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold py-3 px-6 rounded-lg transition-all duration-200">
             Load More Connections
           </button>
         </div>
