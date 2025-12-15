@@ -39,6 +39,7 @@ const Connections = () => {
 
   useEffect(() => {
     setPageColor("#f59e0b"); // amber
+    getConnections();
     return () => setPageColor(null);
   }, []);
 
