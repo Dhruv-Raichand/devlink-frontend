@@ -21,7 +21,7 @@ const Requests = () => {
       });
 
       console.log(res?.data?.data);
-      dispatch(addConnection(res?.data?.data || null));
+      dispatch(addRequest(res?.data?.data || null));
     } catch (err) {
       console.error("Error fetching requests:", err);
       setError(err?.response?.data || "Failed to load requests");
