@@ -6,6 +6,9 @@ import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import SwipeableCard from "./SwipeableCard";
 import { useSilk } from "../context/SilkContext";
 import { useLoading } from "../context/LoadingContext";
+import { useApiCall } from "../hooks/useApiCall";
+import LoadingSpinner from "./LoadingSpinner";
+import ErrorMessage from "./ErrorMessage";
 
 const Feed = () => {
   const feed = useSelector((state) => state.feed);
@@ -13,28 +16,27 @@ const Feed = () => {
   const { setPageColor } = useSilk();
   const { setLoading: setGlobalLoading, setError: setGlobalError } =
     useLoading();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { loading, error, execute } = useApiCall();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const getFeed = async () => {
-    try {
-      setLoading(true);
-      setGlobalLoading(true);
-      setError(null);
-      setGlobalError(false);
-      const res = await axios.get(BASE_URL + "/feed", {
+    setGlobalLoading(true);
+
+    // FIX 1: Changed 'res' to 'result' to match the pattern
+    const result = await execute(() =>
+      axios.get(BASE_URL + "/feed", {
         withCredentials: true,
-      });
-      console.log(res?.data?.data);
-      dispatch(addFeed(res?.data?.data));
-    } catch (err) {
-      console.error("Error fetching feed:", err);
-      setError("Failed to load feed. Please try again.");
+      })
+    );
+
+    setGlobalLoading(false);
+
+    if (result.success) {
+      // FIX 2: Access data correctly from result
+      dispatch(addFeed(result.data?.data?.data));
+      setGlobalError(false);
+    } else {
       setGlobalError(true);
-    } finally {
-      setLoading(false);
-      setGlobalLoading(false);
     }
   };
 
@@ -42,62 +44,40 @@ const Feed = () => {
     if (!userId) return;
 
     setIsProcessing(true);
-    try {
-      await axios.post(
+
+    // FIX 3: Added 'const result' to capture the response
+    const result = await execute(() =>
+      axios.post(
         BASE_URL + "/request/send/" + status + "/" + userId,
         {},
         { withCredentials: true }
-      );
+      )
+    );
+
+    // FIX 4: Moved setIsProcessing inside the if block
+    if (result.success) {
       dispatch(removeUserFromFeed(userId));
-    } catch (err) {
-      console.error("Error sending request:", err);
-    } finally {
-      setIsProcessing(false);
+      setGlobalError(false);
+    } else {
+      setGlobalError(true);
     }
+
+    setIsProcessing(false);
   };
 
   useEffect(() => {
     setPageColor("#5227ff"); // purple
+    getFeed();
     return () => setPageColor(null);
   }, []);
 
-  useEffect(() => {
-    getFeed();
-  }, []);
-
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] p-4">
-        <div className="text-center">
-          <div className="loading loading-spinner loading-lg text-blue-600 dark:text-blue-400 mb-4"></div>
-          <p className="text-lg text-gray-900 dark:text-white">
-            Finding your perfect matches...
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            This might take a moment
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Finding your perfect matches..." />;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] p-4">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">⛔️💥</div>
-          <h2 className="text-2xl font-bold mb-2 text-red-600 dark:text-red-400">
-            Something went wrong
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-          <button
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
-            onClick={getFeed}>
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+    // FIX 5: Added 'return' statement - you were missing this!
+    return <ErrorMessage message={error} onRetry={getFeed} />;
   }
 
   if (!feed || feed.length <= 0) {
