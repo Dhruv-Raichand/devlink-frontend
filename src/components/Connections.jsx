@@ -1,92 +1,71 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnection } from "../utils/connectionSlice";
 import { Link } from "react-router-dom";
 import { useSilk } from "../context/SilkContext";
 import { useLoading } from "../context/LoadingContext";
+import { useApiCall } from "../hooks/useApiCall"; // NEW!
+import LoadingSpinner from "./LoadingSpinner"; // NEW!
+import ErrorMessage from "./ErrorMessage"; // NEW!
 
 const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((state) => state.connection);
-  const { setPageColor } = useSilk(); // <-- get the setter
+  const { setPageColor } = useSilk();
   const { setLoading: setGlobalLoading, setError: setGlobalError } =
     useLoading();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // THIS IS THE ONLY NEW THING!
+  const { loading, error, execute } = useApiCall();
 
   const getConnections = async () => {
-    try {
-      setLoading(true);
-      setGlobalLoading(true);
-      setError(null);
+    setGlobalLoading(true);
+
+    // Just wrap your axios call in execute()
+    const result = await execute(() =>
+      axios.get(BASE_URL + "/user/connections", { withCredentials: true })
+    );
+
+    setGlobalLoading(false);
+
+    if (result.success) {
+      dispatch(addConnection(result.data?.data?.data));
       setGlobalError(false);
-      const res = await axios.get(BASE_URL + "/user/connections", {
-        withCredentials: true,
-      });
-      console.log(res?.data?.data);
-      dispatch(addConnection(res?.data?.data));
-    } catch (err) {
-      console.error("Error fetching connections:", err);
-      setError(err?.response?.data);
+    } else {
       setGlobalError(true);
-    } finally {
-      setLoading(false);
-      setGlobalLoading(false);
     }
   };
 
   useEffect(() => {
-    setPageColor("#f59e0b"); // amber
+    setPageColor("#f59e0b");
     getConnections();
     return () => setPageColor(null);
   }, []);
 
+  // SIMPLE: Just 3 if statements!
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <div className="loading loading-spinner loading-lg text-blue-600 dark:text-blue-400 mb-4"></div>
-        <p className="text-lg text-gray-900 dark:text-white">
-          Loading your connections...
-        </p>
-      </div>
-    );
+    return <LoadingSpinner message="Loading your connections..." />;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">⛔️💥</div>
-          <h2 className="text-2xl font-bold mb-2 text-red-600 dark:text-red-400">
-            Oops!
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-          <button
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
-            onClick={getConnections}>
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorMessage message={error} onRetry={getConnections} />;
   }
 
   if (!connections || connections.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-6">⛓️💥</div>
+          <div className="text-6xl mb-6">🔗</div>
           <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
             No Connections Yet
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Start swiping to find your perfect matches and build meaningful
-            connections!
+            Start swiping to find your perfect matches!
           </p>
           <Link
-            to={"/"}
+            to="/"
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg inline-block">
             Start Swiping
           </Link>
@@ -95,9 +74,9 @@ const Connections = () => {
     );
   }
 
+  // Your existing card display code stays the same!
   return (
     <div className="py-6 sm:py-8 lg:py-12">
-      {/* Header Section */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
           Your Connections 🔗
@@ -108,7 +87,6 @@ const Connections = () => {
         </p>
       </div>
 
-      {/* Connections Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
         {connections.map((connection) => {
           const { _id, firstName, lastName, photoUrl, age, gender, about } =
@@ -117,7 +95,6 @@ const Connections = () => {
             <div
               key={_id}
               className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02] flex flex-col">
-              {/* Profile Image */}
               <div className="relative">
                 <img
                   src={photoUrl}
@@ -135,7 +112,6 @@ const Connections = () => {
                 </div>
               </div>
 
-              {/* Profile Info */}
               <div className="p-4 flex flex-col flex-1">
                 <h2 className="text-xl font-bold mb-2 truncate text-gray-900 dark:text-white">
                   {firstName} {lastName}
@@ -158,7 +134,6 @@ const Connections = () => {
                   </p>
                 )}
 
-                {/* Action Buttons pinned to bottom */}
                 <div className="flex gap-2 mt-auto">
                   <Link
                     to={"/chat/" + _id}
@@ -166,36 +141,12 @@ const Connections = () => {
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 text-sm flex-1 text-center">
                     Message
                   </Link>
-                  <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-lg transition-all duration-200">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                      />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
-
-      {/* Load More Button (if needed for pagination) */}
-      {connections.length > 0 && (
-        <div className="text-center mt-12">
-          <button className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold py-3 px-6 rounded-lg transition-all duration-200">
-            Load More Connections
-          </button>
-        </div>
-      )}
     </div>
   );
 };
