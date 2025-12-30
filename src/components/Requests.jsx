@@ -30,7 +30,7 @@ const Requests = () => {
     setGlobalLoading(false);
 
     if (result.success) {
-      dispatch(addRequest(res?.data?.data || null));
+      dispatch(addRequest(result?.data?.data?.data || null));
       setGlobalError(false);
     } else {
       setGlobalError(true);
