@@ -134,15 +134,6 @@ const Requests = () => {
                     {about}
                   </p>
                 )}
-
-                <div className="flex gap-2 mt-auto">
-                  <Link
-                    to={"/chat/" + _id}
-                    state={{ targetUser: connection }}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 text-sm flex-1 text-center">
-                    Message
-                  </Link>
-                </div>
               </div>
             </div>
           );
