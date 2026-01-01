@@ -20,6 +20,16 @@ const Connections = () => {
   // THIS IS THE ONLY NEW THING!
   const { loading, error, execute } = useApiCall();
 
+  const defaultSkills = [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "MongoDB",
+    "CSS",
+    "ghhj",
+    "fghjn  ",
+  ];
+
   const getConnections = async () => {
     setGlobalLoading(true);
 
@@ -132,6 +142,47 @@ const Connections = () => {
                   <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4">
                     {about}
                   </p>
+                )}
+
+                {/* Skills Section for Connections */}
+                {((connection.skills && connection.skills.length > 0) ||
+                  defaultSkills.length > 0) && (
+                  <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                    {(connection.skills && connection.skills.length > 0
+                      ? connection.skills
+                      : defaultSkills
+                    )
+                      .slice(0, 4)
+                      .map((skill, index) => {
+                        const skillBorderColors = [
+                          "border-indigo-400 text-indigo-600 dark:border-indigo-400 dark:text-indigo-300",
+                          "border-emerald-400 text-emerald-600 dark:border-emerald-400 dark:text-emerald-300",
+                          "border-sky-400 text-sky-600 dark:border-sky-400 dark:text-sky-300",
+                          "border-amber-400 text-amber-600 dark:border-amber-400 dark:text-amber-300",
+                        ];
+                        return (
+                          <span
+                            key={index}
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                              skillBorderColors[
+                                index % skillBorderColors.length
+                              ]
+                            } transition-all hover:scale-105 cursor-default`}>
+                            {skill}
+                          </span>
+                        );
+                      })}
+
+                    {((connection.skills && connection.skills.length) ||
+                      defaultSkills.length) > 4 && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">
+                        +
+                        {((connection.skills && connection.skills.length) ||
+                          defaultSkills.length) - 4}{" "}
+                        more
+                      </span>
+                    )}
+                  </div>
                 )}
 
                 <div className="flex gap-2 mt-auto">

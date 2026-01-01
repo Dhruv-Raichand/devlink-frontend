@@ -4,13 +4,21 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequest, removeRequest } from "../utils/requestSlice";
 import { toast } from "react-toastify";
+import { useSilk } from "../context/SilkContext";
+import { useLoading } from "../context/LoadingContext";
+import { useApiCall } from "../hooks/useApiCall";
+import LoadingSpinner from "./LoadingSpinner";
+import ErrorMessage from "./ErrorMessage";
 
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((state) => state.request);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { setPageColor } = useSilk();
+  const { setLoading: setGlobalLoading, setError: setGlobalError } =
+    useLoading();
   const [processingRequests, setProcessingRequests] = useState(new Set());
+
+  const { loading, error, execute } = useApiCall();
 
   const notify = (msg, type = "success") => {
     const toastConfig = {
@@ -65,54 +73,40 @@ const Requests = () => {
   };
 
   const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      setError("");
+    setGlobalLoading(true);
 
-      const res = await axios.get(BASE_URL + "/user/requests/received", {
+    const result = await execute(() =>
+      axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
-      });
+      })
+    );
+    setGlobalLoading(false);
 
-      console.log(res?.data?.data);
-      dispatch(addRequest(res?.data?.data || []));
-    } catch (err) {
-      const errorMessage =
-        err?.response?.data?.message || "Failed to load requests";
-      setError(errorMessage);
-      console.error("Error fetching requests:", errorMessage);
-    } finally {
-      setLoading(false);
+    if (result.success) {
+      dispatch(addRequest(result?.data?.data?.data || []));
+      console.log(result?.data?.data?.data);
+      setGlobalError(false);
+    } else {
+      setGlobalError(true);
     }
+    // const errorMessage =
+    //   err?.response?.data?.message || "Failed to load requests";
+    // setError(errorMessage);
+    // console.error("Error fetching requests:", errorMessage);
   };
 
   useEffect(() => {
+    setPageColor("#22c55e");
     fetchRequests();
+    return () => setPageColor(null);
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
-        <p className="text-lg">Loading your requests...</p>
-      </div>
-    );
+    return <LoadingSpinner message="Loading your requests..." />;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <div className="text-center max-w-md">
-          <div className="text-error text-6xl mb-4">📮</div>
-          <h2 className="text-2xl font-bold mb-2 text-error">
-            Unable to Load Requests
-          </h2>
-          <p className="text-base-content/70 mb-4">{error}</p>
-          <button className="btn btn-primary" onClick={fetchRequests}>
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorMessage message={error} onRetry={fetchRequests} />;
   }
 
   if (!requests || requests.length === 0) {

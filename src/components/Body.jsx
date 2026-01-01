@@ -13,13 +13,12 @@ import { useSilk } from "../context/SilkContext";
 import { useLoading } from "../context/LoadingContext";
 
 const Body = () => {
-  const [silkColor, setSilkColor] = useState("#5227ff");
   const userData = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { pageColor, setPageColor } = useSilk();
+  const { pageColor } = useSilk();
   const silkContainerRef = useRef(null);
   const {
     loading: pageLoading,
@@ -60,35 +59,30 @@ const Body = () => {
     fetchUser();
   }, []);
 
-  // Determine Silk color based on state
   const getSilkColor = () => {
-    if (pageError || error) return "#ef4444"; // red
-    if (pageLoading || loading) return "#3b82f6"; // blue while loading
-    return pageColor || "#5227ff"; // page-specific OR default purple
+    if (pageError || error) return "#ef4444";
+    if (pageLoading || loading) return "#3b82f6";
+    return pageColor || "#5227ff";
   };
 
   const SilkFallback = ({ color }) => (
     <div
       className="absolute inset-0"
       style={{
-        background: `linear-gradient(
-      to bottom,
-      ${color} 0%,
-      rgba(0, 0, 0, 0.7) 100%
-    )`,
+        background: `linear-gradient(to bottom, ${color} 0%, rgba(0, 0, 0, 0.7) 100%)`,
       }}
     />
   );
 
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
-      {/* Silk with dynamic color - animation won't pause now! */}
+    <div className="relative min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      {/* Silk Background - FIXED: No overflow hidden */}
       <div
         ref={silkContainerRef}
-        className="absolute inset-0 z-0 pointer-events-none">
+        className="fixed inset-0 z-0 pointer-events-none">
         <Suspense fallback={<SilkFallback color={getSilkColor()} />}>
           <Silk
-            container={silkContainerRef.current} // THIS is critical
+            container={silkContainerRef.current}
             key="main-silk"
             speed={5}
             scale={1}
@@ -99,7 +93,7 @@ const Body = () => {
         </Suspense>
       </div>
 
-      {/* All content sits above Silk */}
+      {/* Content Layer - FIXED: Better structure */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <ToastContainer
           position="top-right"
@@ -119,7 +113,7 @@ const Body = () => {
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="text-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full">
               <div className="relative w-16 h-16 mx-auto mb-6">
                 <div className="absolute inset-0 rounded-full border-4 border-blue-200 dark:border-blue-800"></div>
                 <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 animate-spin"></div>
@@ -133,8 +127,8 @@ const Body = () => {
             </div>
           </div>
         ) : error ? (
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="text-center max-w-md bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
+          <div className="flex-1 flex items-center justify-center px-4">
+            <div className="text-center max-w-md w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
               <div className="w-20 h-20 mx-auto mb-6 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
                 <svg
                   className="w-10 h-10 text-red-600 dark:text-red-400"
@@ -149,7 +143,6 @@ const Body = () => {
                   />
                 </svg>
               </div>
-
               <h2 className="text-2xl font-bold mb-3 text-red-600 dark:text-red-400">
                 Something went wrong
               </h2>
@@ -162,31 +155,19 @@ const Body = () => {
                   setError(null);
                   fetchUser();
                 }}>
-                <svg
-                  className="w-5 h-5 mr-2 inline-block"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
                 Try Again
               </button>
             </div>
           </div>
         ) : (
+          // FIXED: Proper spacing - pt-20 instead of pt-24
           <main className="flex-1">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-full">
-              <div className="max-w-7xl mx-auto">
-                <Outlet />
-              </div>
+            <div className="w-full px-4 sm:px-6 lg:px-8 pb-8">
+              <Outlet />
             </div>
           </main>
         )}
+
         <Footer />
       </div>
     </div>

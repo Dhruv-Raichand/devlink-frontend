@@ -9,21 +9,38 @@ const UserCard = ({ user }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  const sendRequest = async (status, userId) => {
-    if (!userId) return; // Prevent action if no userId (for preview mode)
+  const defaultSkills = [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "MongoDB",
+    "CSS",
+    "ghhj",
+    "fghjn  ",
+  ];
 
-    setIsProcessing(true);
+  // const getSkillColor = (index) => skillColors[index % skillColors.length];
+
+  const sendRequest = async (status, userId, setIsProcessing) => {
+    if (!userId) return;
+
     try {
+      // Start local spinner if provided
+      setIsProcessing?.(true);
+
       await axios.post(
-        BASE_URL + "/request/send/" + status + "/" + userId,
+        `${BASE_URL}/request/send/${status}/${userId}`,
         {},
         { withCredentials: true }
       );
+
+      // Remove user from feed (redux)
       dispatch(removeUserFromFeed(userId));
     } catch (err) {
       console.error("Error sending request:", err);
     } finally {
-      setIsProcessing(false);
+      // Stop spinner
+      setIsProcessing?.(false);
     }
   };
 
@@ -108,6 +125,40 @@ const UserCard = ({ user }) => {
           </div>
         )}
 
+        {/* Skills Section */}
+        {(user?.skills?.length > 0 || defaultSkills.length > 0) && (
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2">
+              {(user?.skills?.length > 0 ? user.skills : defaultSkills)
+                .slice(0, 4)
+                .map((skill, index) => {
+                  const skillBorderColors = [
+                    "border-indigo-400 text-indigo-600 dark:border-indigo-400 dark:text-indigo-300",
+                    "border-emerald-400 text-emerald-600 dark:border-emerald-400 dark:text-emerald-300",
+                    "border-sky-400 text-sky-600 dark:border-sky-400 dark:text-sky-300",
+                    "border-amber-400 text-amber-600 dark:border-amber-400 dark:text-amber-300",
+                  ];
+
+                  return (
+                    <span
+                      key={index}
+                      className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                        skillBorderColors[index % skillBorderColors.length]
+                      } transition-all hover:scale-105 cursor-default`}>
+                      {skill}
+                    </span>
+                  );
+                })}
+
+              {(user?.skills?.length || defaultSkills.length) > 4 && (
+                <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">
+                  +{(user?.skills?.length || defaultSkills.length) - 4} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Action Buttons - Only show if userId exists (not in preview mode) */}
         {user?._id && (
           <div className="flex gap-3">
@@ -131,7 +182,7 @@ const UserCard = ({ user }) => {
                       d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
-                  Pass
+                  Ignore
                 </>
               )}
             </button>
@@ -150,7 +201,7 @@ const UserCard = ({ user }) => {
                     viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
-                  Like
+                  Interested
                 </>
               )}
             </button>

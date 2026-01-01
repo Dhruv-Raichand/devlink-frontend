@@ -1,8 +1,16 @@
 import ProfileEdit from "./ProfileEdit";
 import { useSelector } from "react-redux";
+import { useSilk } from "../context/SilkContext";
+import { useEffect } from "react";
 
 const Profile = () => {
   const user = useSelector((state) => state.user);
+  const { setPageColor } = useSilk();
+
+  useEffect(() => {
+    setPageColor("#6366f1");
+    return () => setPageColor(null);
+  }, []);
 
   // Loading state
   if (!user) {

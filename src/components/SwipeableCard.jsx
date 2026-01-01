@@ -7,7 +7,6 @@ const SwipeableCard = ({
   zIndex = 1,
   scale = 1,
   topOffset = 0,
-  transition = "none",
 }) => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [start, setStart] = useState(null);
