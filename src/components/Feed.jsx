@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import SwipeableCard from "./SwipeableCard";
 import { useSilk } from "../context/SilkContext";
