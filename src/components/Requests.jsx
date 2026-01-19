@@ -9,6 +9,7 @@ import { useLoading } from "../context/LoadingContext";
 import { useApiCall } from "../hooks/useApiCall";
 import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
+import { Link } from "react-router-dom";
 
 const Requests = () => {
   const dispatch = useDispatch();
@@ -119,7 +120,9 @@ const Requests = () => {
             You don't have any connection requests at the moment. Keep swiping
             to find more matches!
           </p>
-          <button className="btn btn-primary btn-lg">Back to Feed</button>
+          <Link to={"/"} className="btn btn-primary btn-lg">
+            Back to Feed
+          </Link>
         </div>
       </div>
     );

@@ -7,9 +7,6 @@ const Footer = () => {
           <div className="hidden sm:flex w-full justify-between items-center">
             <aside className="flex items-center gap-4">
               {/* Simple circular logo */}
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <span className="text-white font-bold text-lg">D</span>
-              </div>
               <div className="flex flex-col">
                 <p className="font-semibold text-lg text-white">DevLink</p>
                 <p className="text-sm text-white/60">
@@ -50,7 +47,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="https://github.com"
+                href="https://github.com/Dhruv-Raichand"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white rounded-xl transition-all duration-300 hover:scale-110"
@@ -70,9 +67,6 @@ const Footer = () => {
           {/* Mobile Layout */}
           <div className="sm:hidden flex flex-col items-center text-center space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <span className="text-white font-bold text-lg">D</span>
-              </div>
               <span className="font-semibold text-lg text-white">DevLink</span>
             </div>
 
