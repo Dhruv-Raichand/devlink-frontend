@@ -93,7 +93,10 @@ const Chat = () => {
   };
 
   const formatMessageTime = (date) => {
-    return new Date(date).toLocaleTimeString("en-US", {
+    return new Date(date).toLocaleString("en-US", {
+      month: "short", // Jan, Feb, etc
+      day: "numeric", // 27
+      year: "numeric", // 2026
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
