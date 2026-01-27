@@ -54,13 +54,15 @@ const Chat = () => {
       userId,
       targetUserId,
     });
-    socket.on("messageReceived", ({ firstName, lastName, photoUrl, text }) => {
-      console.log(firstName + ": " + text);
-      setMessages((messages) => [
-        ...messages,
-        { firstName, lastName, photoUrl, text },
-      ]);
-    });
+    socket.on(
+      "messageReceived",
+      ({ firstName, lastName, photoUrl, text, createdAt }) => {
+        setMessages((messages) => [
+          ...messages,
+          { firstName, lastName, photoUrl, text, createdAt },
+        ]);
+      },
+    );
     return () => {
       socket.disconnect();
     };
@@ -120,14 +122,14 @@ const Chat = () => {
                 key={index}
                 className={
                   "chat " +
-                  (msg?.firstName == user?.firstName
-                    ? " chat-end"
-                    : " chat-start")
+                  (msg?.firstName == user?.firstName ?
+                    " chat-end"
+                  : " chat-start")
                 }>
                 {console.log(
-                  msg?.firstName == user?.firstName
-                    ? " chat-end"
-                    : " chat-start"
+                  msg?.firstName == user?.firstName ?
+                    " chat-end"
+                  : " chat-start",
                 )}
                 <div className="chat-image avatar">
                   <div className="w-10 rounded-full">
@@ -138,9 +140,9 @@ const Chat = () => {
                   </div>
                 </div>
                 <div className="chat-header">
-                  {msg.firstName === user.firstName
-                    ? "You"
-                    : `${msg.firstName} ${msg.lastName}`}
+                  {msg.firstName === user.firstName ?
+                    "You"
+                  : `${msg.firstName} ${msg.lastName}`}
                   <time className="text-xs opacity-50">
                     {formatMessageTime(msg?.createdAt)}
                   </time>
