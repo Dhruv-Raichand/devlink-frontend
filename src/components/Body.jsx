@@ -8,8 +8,7 @@ import { addUser } from "../utils/userSlice";
 import { useEffect, useState, useRef } from "react";
 import { ToastContainer, Flip } from "react-toastify";
 import { lazy, Suspense } from "react";
-// const Silk = lazy(() => import("./Silk"));
-import Silk from "./Silk";
+const Silk = lazy(() => import("./Silk"));
 import { useSilk } from "../context/SilkContext";
 import { useLoading } from "../context/LoadingContext";
 
