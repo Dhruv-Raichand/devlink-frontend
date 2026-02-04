@@ -8,7 +8,8 @@ import { addUser } from "../utils/userSlice";
 import { useEffect, useState, useRef } from "react";
 import { ToastContainer, Flip } from "react-toastify";
 import { lazy, Suspense } from "react";
-const Silk = lazy(() => import("./Silk"));
+// const Silk = lazy(() => import("./Silk"));
+import Silk from "./Silk";
 import { useSilk } from "../context/SilkContext";
 import { useLoading } from "../context/LoadingContext";
 
@@ -111,7 +112,7 @@ const Body = () => {
 
         <NavBar />
 
-        {loading ? (
+        {loading ?
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full">
               <div className="relative w-16 h-16 mx-auto mb-6">
@@ -126,7 +127,7 @@ const Body = () => {
               </p>
             </div>
           </div>
-        ) : error ? (
+        : error ?
           <div className="flex-1 flex items-center justify-center px-4">
             <div className="text-center max-w-md w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700">
               <div className="w-20 h-20 mx-auto mb-6 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
@@ -159,14 +160,13 @@ const Body = () => {
               </button>
             </div>
           </div>
-        ) : (
           // FIXED: Proper spacing - pt-20 instead of pt-24
-          <main className="flex-1">
+        : <main className="flex-1">
             <div className="w-full px-4 sm:px-6 lg:px-8 pb-8">
               <Outlet />
             </div>
           </main>
-        )}
+        }
 
         <Footer />
       </div>

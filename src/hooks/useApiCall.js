@@ -12,10 +12,8 @@ export const useApiCall = () => {
 
     try {
       const result = await apiFunction();
-      setLoading(false);
       return { success: true, data: result };
     } catch (err) {
-      // Simple error handling
       let errorMessage = "Something went wrong";
 
       if (!err.response) {
@@ -28,10 +26,13 @@ export const useApiCall = () => {
       }
 
       setError(errorMessage);
-      setLoading(false);
       return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { loading, error, execute };
+  const resetError = () => setError(null);
+
+  return { loading, error, execute, resetError };
 };

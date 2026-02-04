@@ -25,7 +25,7 @@ const Feed = () => {
     const result = await execute(() =>
       axios.get(BASE_URL + "/feed", {
         withCredentials: true,
-      })
+      }),
     );
 
     setGlobalLoading(false);
@@ -38,30 +38,25 @@ const Feed = () => {
     }
   };
 
-  const sendRequest = async (status, userId, setIsProcessing) => {
+  const sendRequest = async (status, userId) => {
     if (!userId) return;
 
     try {
-      // Start local loading (pass setIsProcessing from the card/button)
       setIsProcessing(true);
 
       await axios.post(
         `${BASE_URL}/request/send/${status}/${userId}`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
-      // Remove user from feed
       dispatch(removeUserFromFeed(userId));
-
-      // Clear any global errors
       setGlobalError(false);
     } catch (err) {
       console.error("Error sending request:", err);
       setGlobalError(true);
     } finally {
-      // Stop local loading
-      setIsProcessing?.(false);
+      setIsProcessing(false);
     }
   };
 
@@ -139,7 +134,8 @@ const Feed = () => {
             zIndex={feed.length - index}
             scale={1 - index * 0.02}
             topOffset={index * 8}
-            transition="transform 0.3s ease"
+            isTop={index === 0}
+            disabled={isProcessing}
           />
         ))}
       </div>
