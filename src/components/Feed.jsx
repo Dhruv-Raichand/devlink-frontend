@@ -12,6 +12,8 @@ import ErrorMessage from "./ErrorMessage";
 
 const Feed = () => {
   const feed = useSelector((state) => state.feed);
+  const [profilesCount, setProfilesCount] = useState(0);
+
   const dispatch = useDispatch();
   const { setPageColor } = useSilk();
   const { setLoading: setGlobalLoading, setError: setGlobalError } =
@@ -32,6 +34,8 @@ const Feed = () => {
 
     if (result.success) {
       dispatch(addFeed(result.data?.data?.data));
+      setProfilesCount(result?.data?.data?.pagination?.totalUsers);
+
       setGlobalError(false);
     } else {
       setGlobalError(true);
@@ -39,7 +43,7 @@ const Feed = () => {
   };
 
   const sendRequest = async (status, userId) => {
-    if (!userId) return;
+    if (!userId || isProcessing) return;
 
     try {
       setIsProcessing(true);
@@ -51,6 +55,7 @@ const Feed = () => {
       );
 
       dispatch(removeUserFromFeed(userId));
+      setProfilesCount((prev) => prev - 1);
       setGlobalError(false);
     } catch (err) {
       console.error("Error sending request:", err);
@@ -113,12 +118,12 @@ const Feed = () => {
       {/* Feed Counter - Better positioning */}
       <div className="flex justify-center mb-2">
         <div className="inline-flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-full px-5 py-2.5 shadow-lg">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-            {feed.length} profile{feed.length !== 1 ? "s" : ""} remaining
-          </span>
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold px-2.5 py-1 rounded-full min-w-[24px] text-center">
-            {feed.length}
+            {profilesCount}
           </div>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            profiles remaining
+          </span>
         </div>
       </div>
 

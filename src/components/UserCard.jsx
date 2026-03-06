@@ -1,12 +1,7 @@
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
-import { useDispatch } from "react-redux";
-import { removeUserFromFeed } from "../utils/feedSlice";
 import { useState } from "react";
 
-const UserCard = ({ user }) => {
-  const dispatch = useDispatch();
-  const [isProcessing, setIsProcessing] = useState(false);
+const UserCard = ({ user, sendRequest, disabled }) => {
+  // const [isProcessing, setIsProcessing] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   const defaultSkills = [
@@ -20,29 +15,6 @@ const UserCard = ({ user }) => {
   ];
 
   // const getSkillColor = (index) => skillColors[index % skillColors.length];
-
-  const sendRequest = async (status, userId, setIsProcessing) => {
-    if (!userId) return;
-
-    try {
-      // Start local spinner if provided
-      setIsProcessing?.(true);
-
-      await axios.post(
-        `${BASE_URL}/request/send/${status}/${userId}`,
-        {},
-        { withCredentials: true }
-      );
-
-      // Remove user from feed (redux)
-      dispatch(removeUserFromFeed(userId));
-    } catch (err) {
-      console.error("Error sending request:", err);
-    } finally {
-      // Stop spinner
-      setIsProcessing?.(false);
-    }
-  };
 
   const getGenderDisplay = (gender) => {
     const genderMap = {
@@ -58,7 +30,7 @@ const UserCard = ({ user }) => {
   const getProfileImage = () => {
     if (imageError || !user?.photoUrl) {
       return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        `${user?.firstName || "User"} ${user?.lastName || ""}`
+        `${user?.firstName || "User"} ${user?.lastName || ""}`,
       )}&background=6366f1&color=ffffff&size=400&font-size=0.6`;
     }
     return user.photoUrl;
@@ -118,9 +90,9 @@ const UserCard = ({ user }) => {
         {user?.about && (
           <div className="mb-6">
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
-              {user.about.length > 120
-                ? `${user.about.substring(0, 120)}...`
-                : user.about}
+              {user.about.length > 120 ?
+                `${user.about.substring(0, 120)}...`
+              : user.about}
             </p>
           </div>
         )}
@@ -164,12 +136,11 @@ const UserCard = ({ user }) => {
           <div className="flex gap-3">
             <button
               onClick={() => sendRequest("ignored", user._id)}
-              disabled={isProcessing}
+              disabled={disabled}
               className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-sm hover:shadow-md flex items-center justify-center">
-              {isProcessing ? (
+              {disabled ?
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-400"></div>
-              ) : (
-                <>
+              : <>
                   <svg
                     className="w-4 h-4 mr-2"
                     fill="none"
@@ -184,17 +155,16 @@ const UserCard = ({ user }) => {
                   </svg>
                   Ignore
                 </>
-              )}
+              }
             </button>
 
             <button
               onClick={() => sendRequest("interested", user._id)}
-              disabled={isProcessing}
+              disabled={disabled}
               className="flex-1 bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center justify-center">
-              {isProcessing ? (
+              {disabled ?
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                <>
+              : <>
                   <svg
                     className="w-4 h-4 mr-2"
                     fill="currentColor"
@@ -203,7 +173,7 @@ const UserCard = ({ user }) => {
                   </svg>
                   Interested
                 </>
-              )}
+              }
             </button>
           </div>
         )}

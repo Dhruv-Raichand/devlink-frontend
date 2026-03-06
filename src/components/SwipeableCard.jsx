@@ -97,7 +97,7 @@ const SwipeableCard = ({
         handleMove(e.touches[0].clientX, e.touches[0].clientY)
       }
       onTouchEnd={handleEnd}>
-      <UserCard user={user} />
+      <UserCard user={user} sendRequest={sendRequest} disabled={disabled} />
       {offset.x > 90 && (
         <div
           className="absolute top-6 right-6
