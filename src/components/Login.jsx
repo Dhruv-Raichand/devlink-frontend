@@ -51,12 +51,13 @@ const Login = () => {
           emailId,
           password,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       notify("Registration Successful!");
       dispatch(addUser(res.data.data));
       return navigate("/profile");
     } catch (err) {
+      console.log(err.message.data);
       notifyErr(err?.response?.data?.message || "Registration failed");
       setError(err?.response?.data?.message || "Registration failed");
       console.log(err);
@@ -74,7 +75,7 @@ const Login = () => {
           emailId,
           password,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       notify("Login Successful!");
       dispatch(addUser(res.data));
@@ -97,9 +98,9 @@ const Login = () => {
             {isLoginMode ? "Welcome Back" : "Join DevLink"}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
-            {isLoginMode
-              ? "Sign in to your account"
-              : "Create your new account"}
+            {isLoginMode ?
+              "Sign in to your account"
+            : "Create your new account"}
           </p>
         </div>
 
@@ -109,9 +110,9 @@ const Login = () => {
           <div className="flex bg-gray-100 dark:bg-gray-700/50">
             <button
               className={`flex-1 py-4 text-sm font-semibold transition-all duration-300 ${
-                isLoginMode
-                  ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                isLoginMode ?
+                  "text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
               onClick={() => {
                 setIsLoginMode(true);
@@ -121,9 +122,9 @@ const Login = () => {
             </button>
             <button
               className={`flex-1 py-4 text-sm font-semibold transition-all duration-300 ${
-                !isLoginMode
-                  ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                !isLoginMode ?
+                  "text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
               onClick={() => {
                 setIsLoginMode(false);
@@ -222,16 +223,14 @@ const Login = () => {
                 onClick={isLoginMode ? handleLogin : handleSignUp}
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg">
-                {isLoading ? (
+                {isLoading ?
                   <div className="flex items-center justify-center space-x-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                     <span>Processing...</span>
                   </div>
-                ) : isLoginMode ? (
+                : isLoginMode ?
                   "Sign In"
-                ) : (
-                  "Create Account"
-                )}
+                : "Create Account"}
               </button>
 
               {/* Switch Mode */}
@@ -243,9 +242,9 @@ const Login = () => {
                     setError("");
                   }}
                   className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors duration-200">
-                  {isLoginMode
-                    ? "Don't have an account? Sign up"
-                    : "Already have an account? Sign in"}
+                  {isLoginMode ?
+                    "Don't have an account? Sign up"
+                  : "Already have an account? Sign in"}
                 </button>
               </div>
             </form>
