@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { Flip, toast } from "react-toastify";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -14,31 +14,11 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const notify = (msg) =>
-    toast.success(msg, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-      transition: Flip,
-    });
-
-  const notifyErr = (msg) =>
-    toast.error(msg, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Flip,
-    });
+  const user = useSelector((store) => store.user);
 
   const handleSignUp = async () => {
     setIsLoading(true);
@@ -53,12 +33,12 @@ const Login = () => {
         },
         { withCredentials: true },
       );
-      notify("Registration Successful!");
-      dispatch(addUser(res.data.data));
+      notifySuccess("Registration Successful!");
+      dispatch(addUser(res?.data?.data));
       return navigate("/profile");
     } catch (err) {
       console.log(err.message.data);
-      notifyErr(err?.response?.data?.message || "Registration failed");
+      notifyError(err?.response?.data?.message || "Registration failed");
       setError(err?.response?.data?.message || "Registration failed");
       console.log(err);
     } finally {
@@ -77,17 +57,21 @@ const Login = () => {
         },
         { withCredentials: true },
       );
-      notify("Login Successful!");
-      dispatch(addUser(res.data));
+      notifySuccess("Login Successful!");
+      dispatch(addUser(res?.data?.data));
       return navigate("/");
     } catch (err) {
-      notifyErr(err?.response?.data?.message || "Login failed");
+      notifyError(err?.response?.data?.message || "Login failed");
       setError(err?.response?.data?.message || "Login failed");
       console.log(err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) navigate("/");
+  }, [user, navigate]);
 
   return (
     <div className="flex items-center justify-center p-4 min-h-[calc(100vh-200px)]">

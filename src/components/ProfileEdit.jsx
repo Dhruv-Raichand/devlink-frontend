@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import UserCard from "./UserCard";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
-import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 const ProfileEdit = ({ user }) => {
   const [firstName, setFirstName] = useState(user?.firstName || "");
@@ -17,33 +18,38 @@ const ProfileEdit = ({ user }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.photoUrl || "");
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const notify = (msg) =>
-    toast.success(msg, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-    });
+  const originalDataRef = useRef({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    about: user?.about || "",
+    photoUrl: user?.photoUrl || "",
+    age: user?.age || "",
+    gender: user?.gender || "",
+  });
 
-  const notifyError = (msg) =>
-    toast.error(msg, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "colored",
+  const hasChanges =
+    JSON.stringify(originalDataRef.current) !==
+    JSON.stringify({
+      firstName,
+      lastName,
+      about,
+      photoUrl,
+      age,
+      gender,
     });
 
   const handleProfileEdit = async () => {
     setIsLoading(true);
     try {
+      if (!hasChanges) {
+        notifyError("No Changes Detected");
+        setIsLoading(false);
+        return;
+      }
+
       const res = await axios.patch(
         BASE_URL + "/profile/edit",
         {
@@ -52,14 +58,14 @@ const ProfileEdit = ({ user }) => {
           about,
           photoUrl,
           age: age ? parseInt(age) : undefined,
-          gender,
+          gender: gender ? gender : undefined,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
-      notify("Profile Updated Successfully!");
+      notifySuccess(res?.data?.message);
       dispatch(addUser(res.data.data));
     } catch (err) {
-      notifyError(err.response?.data || "Something went wrong");
+      notifyError(err.response?.data?.message || "Something went wrong");
       console.error(err.message);
     } finally {
       setIsLoading(false);
@@ -74,12 +80,12 @@ const ProfileEdit = ({ user }) => {
   const genderOptions = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
-    { value: "other", label: "Other" },
+    { value: "others", label: "Other" },
   ];
 
   return (
     <div className="p-4 sm:p-6">
-      <ToastContainer />
+      {/* <ToastContainer /> */}
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -196,10 +202,10 @@ const ProfileEdit = ({ user }) => {
                         className={
                           gender ? "" : "text-gray-500 dark:text-gray-400"
                         }>
-                        {gender
-                          ? genderOptions.find((opt) => opt.value === gender)
-                              ?.label
-                          : "Select gender"}
+                        {gender ?
+                          genderOptions.find((opt) => opt.value === gender)
+                            ?.label
+                        : "Select gender"}
                       </span>
                       <svg
                         className={`w-5 h-5 transition-transform duration-200 ${
@@ -258,33 +264,20 @@ const ProfileEdit = ({ user }) => {
               </div>
 
               {/* Save Button */}
-              <button
-                onClick={handleProfileEdit}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg">
-                {isLoading ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Saving Changes...</span>
-                  </div>
-                ) : (
-                  <>
-                    <svg
-                      className="w-5 h-5 mr-2 inline-block"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Save Changes
-                  </>
-                )}
-              </button>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => navigate("/")}
+                  className="w-1/2 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200">
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleProfileEdit}
+                  disabled={isLoading || !hasChanges}
+                  className="w-1/2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 disabled:opacity-50">
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
             </div>
           </div>
 

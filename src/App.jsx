@@ -9,12 +9,26 @@ import Feed from "./components/Feed";
 import Requests from "./components/Requests";
 import Chat from "./components/Chat";
 import NotFound from "./components/NotFound";
+import { ToastContainer, Flip } from "react-toastify";
 
 function App() {
   return (
     <>
       <Provider store={appStore}>
         <BrowserRouter basename="/">
+          {/* GLOBAL TOAST CONTAINER */}
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            pauseOnHover
+            draggable
+            theme="dark"
+            transition={Flip}
+          />
+
           <Routes>
             <Route path="/" element={<Body />}>
               <Route index element={<Feed />} />

@@ -5,10 +5,10 @@ export const userSlice = createSlice({
   initialState: null,
   reducers: {
     addUser: (state, action) => {
-      return (state = action.payload);
+      return action.payload;
     },
-    removeUser: (state, action) => {
-      return (state = null);
+    removeUser: () => {
+      return null;
     },
   },
 });

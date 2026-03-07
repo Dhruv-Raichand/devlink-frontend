@@ -6,7 +6,6 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 import { useEffect, useState, useRef } from "react";
-import { ToastContainer, Flip } from "react-toastify";
 import { lazy, Suspense } from "react";
 const Silk = lazy(() => import("./Silk"));
 import { useSilk } from "../context/SilkContext";
@@ -95,20 +94,6 @@ const Body = () => {
 
       {/* Content Layer - FIXED: Better structure */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-          transition={Flip}
-        />
-
         <NavBar />
 
         {loading ?
