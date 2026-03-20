@@ -28,9 +28,7 @@ const Chat = () => {
       withCredentials: true,
     });
 
-    console.log(chat.data.messages);
-
-    const chatMessages = chat?.data?.messages.map((msg) => {
+    const chatMessages = chat?.data?.data?.messages.map((msg) => {
       return {
         firstName: msg.senderId.firstName,
         lastName: msg.senderId.lastName,
@@ -129,11 +127,6 @@ const Chat = () => {
                     " chat-end"
                   : " chat-start")
                 }>
-                {console.log(
-                  msg?.firstName == user?.firstName ?
-                    " chat-end"
-                  : " chat-start",
-                )}
                 <div className="chat-image avatar">
                   <div className="w-10 rounded-full">
                     <img
