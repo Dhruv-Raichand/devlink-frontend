@@ -5,13 +5,12 @@ const UserCard = ({ user, sendRequest, disabled }) => {
   const [imageError, setImageError] = useState(false);
 
   const defaultSkills = [
-    "JavaScript",
-    "React",
-    "Node.js",
-    "MongoDB",
-    "CSS",
-    "ghhj",
-    "fghjn  ",
+    "Skill1",
+    "Skill2",
+    "Skill3",
+    "Skill4",
+    "Skill5",
+    "Skill6",
   ];
 
   // const getSkillColor = (index) => skillColors[index % skillColors.length];

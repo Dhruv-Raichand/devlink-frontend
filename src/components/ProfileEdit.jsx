@@ -17,6 +17,8 @@ const ProfileEdit = ({ user }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.photoUrl || "");
+  const [skills, setSkills] = useState(user?.skills || []);
+  const [skillInput, setSkillInput] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,6 +30,7 @@ const ProfileEdit = ({ user }) => {
     photoUrl: user?.photoUrl || "",
     age: user?.age || "",
     gender: user?.gender || "",
+    skills: user?.skills || [],
   });
 
   const hasChanges =
@@ -39,6 +42,7 @@ const ProfileEdit = ({ user }) => {
       photoUrl,
       age,
       gender,
+      skills,
     });
 
   const handleProfileEdit = async () => {
@@ -59,6 +63,7 @@ const ProfileEdit = ({ user }) => {
           photoUrl,
           age: age ? parseInt(age) : undefined,
           gender: gender ? gender : undefined,
+          skills,
         },
         { withCredentials: true },
       );
@@ -263,6 +268,54 @@ const ProfileEdit = ({ user }) => {
                 </div>
               </div>
 
+              {/* Skills */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Skills
+                </label>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    placeholder="Add a skill"
+                    className="flex-1 px-4 py-2 border rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (
+                        skillInput &&
+                        skills.length < 10 &&
+                        !skills.includes(skillInput)
+                      ) {
+                        setSkills([...skills, skillInput]);
+                        setSkillInput("");
+                      }
+                    }}
+                    className="bg-blue-500 text-white px-4 rounded-lg">
+                    Add
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-600 px-3 py-1 rounded-full flex items-center gap-2">
+                      {skill}
+                      <button
+                        onClick={() =>
+                          setSkills(skills.filter((_, i) => i !== index))
+                        }>
+                        ❌
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
               {/* Save Button */}
               <div className="flex gap-4">
                 <button
@@ -319,6 +372,7 @@ const ProfileEdit = ({ user }) => {
                   photoUrl: previewImage,
                   age,
                   gender,
+                  skills,
                 }}
               />
             </div>
