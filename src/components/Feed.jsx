@@ -4,159 +4,163 @@ import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import SwipeableCard from "./SwipeableCard";
-import { useSilk } from "../context/SilkContext";
-import { useLoading } from "../context/LoadingContext";
-import { useApiCall } from "../hooks/useApiCall";
 import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 
 const Feed = () => {
   const feed = useSelector((state) => state.feed);
-  const [profilesCount, setProfilesCount] = useState(0);
-
   const dispatch = useDispatch();
-  const { setPageColor } = useSilk();
-  const { setLoading: setGlobalLoading, setError: setGlobalError } =
-    useLoading();
-  const { loading, error, execute } = useApiCall();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const getFeed = async () => {
-    setGlobalLoading(true);
-
-    const result = await execute(() =>
-      axios.get(BASE_URL + "/feed", {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(BASE_URL + "/feed", {
         withCredentials: true,
-      }),
-    );
-
-    setGlobalLoading(false);
-
-    if (result.success) {
-      dispatch(addFeed(result.data?.data?.data));
-      setProfilesCount(result?.data?.data?.pagination?.totalUsers);
-
-      setGlobalError(false);
-    } else {
-      setGlobalError(true);
+      });
+      dispatch(addFeed(res.data?.data?.data ?? res.data?.data ?? []));
+      setTotalCount(
+        res.data?.data?.pagination?.totalUsers ??
+          res.data?.pagination?.totalUsers ??
+          0,
+      );
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load feed");
+    } finally {
+      setLoading(false);
     }
   };
 
   const sendRequest = async (status, userId) => {
     if (!userId || isProcessing) return;
-
     try {
       setIsProcessing(true);
-
       await axios.post(
         `${BASE_URL}/request/send/${status}/${userId}`,
         {},
         { withCredentials: true },
       );
-
       dispatch(removeUserFromFeed(userId));
-      setProfilesCount((prev) => prev - 1);
-      setGlobalError(false);
+      setTotalCount((prev) => Math.max(0, prev - 1));
     } catch (err) {
       console.error("Error sending request:", err);
-      setGlobalError(true);
     } finally {
       setIsProcessing(false);
     }
   };
 
   useEffect(() => {
-    setPageColor("#5227ff");
     getFeed();
-    return () => setPageColor(null);
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner message="Finding your perfect matches..." />;
-  }
+  if (loading) return <LoadingSpinner message="Finding your matches..." />;
+  if (error) return <ErrorMessage message={error} onRetry={getFeed} />;
 
-  if (error) {
-    return <ErrorMessage message={error} onRetry={getFeed} />;
-  }
-
-  if (!feed || feed.length <= 0) {
+  if (!feed || feed.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] p-4">
-        <div className="text-center max-w-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-xl">
-          <div className="text-6xl mb-6">🔍</div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-            No More Profiles
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg mb-6">
-            You've seen all available profiles! Check back later for new
-            matches.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg"
-              onClick={getFeed}>
-              Refresh Feed
-            </button>
+      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-full bg-[#1a1928] border border-[#2d2b40] flex items-center justify-center mx-auto mb-5">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-[#6b6880]">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
           </div>
+          <h1 className="font-['Outfit'] font-bold text-[22px] text-white mb-2">
+            No more profiles
+          </h1>
+          <p className="text-[13px] text-[#6b6880] mb-6 leading-relaxed">
+            You've seen everyone for now. Check back later for new developers.
+          </p>
+          <button
+            onClick={getFeed}
+            className="px-5 py-2.5 bg-violet-700 hover:bg-violet-600 text-white text-[13px] font-medium rounded-lg transition-all cursor-pointer border-none">
+            Refresh feed
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-12">
-      {/* Header Section - Compact spacing */}
+    <div className="max-w-2xl mx-auto px-4 pt-10 pb-20">
+      {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-gray-900 dark:text-white">
-          Find Your Coding Partner 🚀
+        <h1 className="font-['Outfit'] font-extrabold text-[28px] md:text-[32px] text-white tracking-tight mb-2">
+          Find your coding partner
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-lg">
-          Swipe right to connect, left to pass
-        </p>
-      </div>
-
-      {/* Feed Counter - Better positioning */}
-      <div className="flex justify-center mb-2">
-        <div className="inline-flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-full px-5 py-2.5 shadow-lg">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold px-2.5 py-1 rounded-full min-w-[24px] text-center">
-            {profilesCount}
-          </div>
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-            profiles remaining
+        <div className="inline-flex items-center gap-2 bg-[#13121c] border border-[#2d2b40] rounded-full px-4 py-1.5 mt-2">
+          <span className="w-5 h-5 rounded-xl bg-violet-700 flex items-center justify-center text-xs font-bold text-white">
+            {totalCount}
           </span>
+          <span className="text-[12px] text-[#6b6880]">remaining</span>
         </div>
       </div>
 
-      {/* User Card Container - Fixed height and better centering */}
+      {/* Card stack — only show top 2 for the illusion */}
       <div
         className="relative flex justify-center items-center"
-        style={{ minHeight: "600px", maxHeight: "650px" }}>
-        {feed.slice(0, 3).map((user, index) => (
+        style={{ height: 560 }}>
+        {feed.slice(0, 2).map((user, index) => (
           <SwipeableCard
             key={user._id}
             user={user}
             sendRequest={sendRequest}
-            zIndex={feed.length - index}
-            scale={1 - index * 0.02}
-            topOffset={index * 8}
+            stackIndex={index}
             isTop={index === 0}
             disabled={isProcessing}
           />
         ))}
       </div>
 
-      {/* Swipe Instructions */}
-      <div className="text-center mt-20 text-sm text-gray-500 dark:text-gray-400">
-        <span className="font-medium">←</span> Swipe or click to{" "}
-        <span className="font-semibold text-gray-700 dark:text-gray-200">
-          Ignore
-        </span>{" "}
-        •{" "}
-        <span className="font-semibold text-gray-700 dark:text-gray-200">
-          Interested
-        </span>{" "}
-        <span className="font-medium">→</span>
-      </div>
+      {/* Pass / Like buttons */}
+      {/* <div className="flex items-center justify-center gap-6 mt-8">
+        <button
+          onClick={() => feed[0] && sendRequest("ignored", feed[0]._id)}
+          disabled={isProcessing || !feed[0]}
+          className="w-14 h-14 rounded-full bg-[#13121c] border border-[#2d2b40] hover:border-red-800/70 hover:bg-red-950/20 text-[#4a4760] hover:text-red-400 flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
+          aria-label="Pass">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
+        <button
+          onClick={() => feed[0] && sendRequest("interested", feed[0]._id)}
+          disabled={isProcessing || !feed[0]}
+          className="w-16 h-16 rounded-full bg-violet-700 hover:bg-violet-600 text-white flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer border-none shadow-lg shadow-violet-950/50"
+          aria-label="Like">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
+      </div> */}
+
+      <p className="text-center text-[11px] text-[#4a4760] mt-4">
+        Drag the card or use the buttons
+      </p>
     </div>
   );
 };

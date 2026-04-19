@@ -3,10 +3,7 @@ import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequest, removeRequest } from "../utils/requestSlice";
-import { toast } from "react-toastify";
-import { useSilk } from "../context/SilkContext";
-import { useLoading } from "../context/LoadingContext";
-import { useApiCall } from "../hooks/useApiCall";
+import { notifySuccess, notifyError } from "../utils/toast";
 import LoadingSpinner from "./LoadingSpinner";
 import ErrorMessage from "./ErrorMessage";
 import { Link } from "react-router-dom";
@@ -14,114 +11,84 @@ import { Link } from "react-router-dom";
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((state) => state.request);
-  const { setPageColor } = useSilk();
-  const { setLoading: setGlobalLoading, setError: setGlobalError } =
-    useLoading();
-  const [processingRequests, setProcessingRequests] = useState(new Set());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(new Set());
 
-  const { loading, error, execute } = useApiCall();
-
-  const notify = (msg, type = "success") => {
-    const toastConfig = {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-    };
-
-    if (type === "success") {
-      toast.success(msg, toastConfig);
-    } else if (type === "error") {
-      toast.error(msg, toastConfig);
+  const fetchRequests = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(BASE_URL + "/user/requests/received", {
+        withCredentials: true,
+      });
+      dispatch(addRequest(res.data?.data || []));
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load requests");
+    } finally {
+      setLoading(false);
     }
   };
 
   const reviewRequest = async (status, requestId) => {
-    if (processingRequests.has(requestId)) return;
-
+    if (processing.has(requestId)) return;
     try {
-      setProcessingRequests((prev) => new Set(prev).add(requestId));
-
-      const res = await axios.post(
-        BASE_URL + "/request/review/" + status + "/" + requestId,
+      setProcessing((prev) => new Set(prev).add(requestId));
+      await axios.post(
+        `${BASE_URL}/request/review/${status}/${requestId}`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
-
-      console.log(res?.data?.data);
       dispatch(removeRequest(requestId));
-
-      // Show success message
-      const action = status === "accepted" ? "accepted" : "rejected";
-      notify(`Request ${action} successfully!`, "success");
+      notifySuccess(`Request ${status} successfully!`);
     } catch (err) {
-      console.error("Error reviewing request:", err);
-      notify(
-        err?.response?.data?.message ||
-          `Failed to ${status} request. Please try again.`,
-        "error"
+      notifyError(
+        err?.response?.data?.message || `Failed to ${status} request`,
       );
     } finally {
-      setProcessingRequests((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(requestId);
-        return newSet;
+      setProcessing((prev) => {
+        const s = new Set(prev);
+        s.delete(requestId);
+        return s;
       });
     }
   };
 
-  const fetchRequests = async () => {
-    setGlobalLoading(true);
-
-    const result = await execute(() =>
-      axios.get(BASE_URL + "/user/requests/received", {
-        withCredentials: true,
-      })
-    );
-    setGlobalLoading(false);
-
-    if (result.success) {
-      dispatch(addRequest(result?.data?.data?.data || []));
-      console.log(result?.data?.data?.data);
-      setGlobalError(false);
-    } else {
-      setGlobalError(true);
-    }
-    // const errorMessage =
-    //   err?.response?.data?.message || "Failed to load requests";
-    // setError(errorMessage);
-    // console.error("Error fetching requests:", errorMessage);
-  };
-
   useEffect(() => {
-    setPageColor("#22c55e");
     fetchRequests();
-    return () => setPageColor(null);
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner message="Loading your requests..." />;
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} onRetry={fetchRequests} />;
-  }
+  if (loading) return <LoadingSpinner message="Loading requests..." />;
+  if (error) return <ErrorMessage message={error} onRetry={fetchRequests} />;
 
   if (!requests || requests.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-6">💌</div>
-          <h1 className="text-3xl font-bold mb-4">No New Requests</h1>
-          <p className="text-base-content/70 mb-6">
-            You don't have any connection requests at the moment. Keep swiping
-            to find more matches!
+      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-full bg-[#1a1928] border border-[#2d2b40] flex items-center justify-center mx-auto mb-5">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-[#6b6880]">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </div>
+          <h1 className="font-['Outfit'] font-bold text-[22px] text-white mb-2">
+            No requests yet
+          </h1>
+          <p className="text-[13px] text-[#6b6880] mb-6 leading-relaxed">
+            When someone likes your profile, their request will appear here.
           </p>
-          <Link to={"/"} className="btn btn-primary btn-lg">
-            Back to Feed
+          <Link
+            to="/app"
+            className="px-5 py-2.5 bg-violet-700 hover:bg-violet-600 text-white text-[13px] font-medium rounded-lg transition-all inline-block">
+            Back to feed
           </Link>
         </div>
       </div>
@@ -129,155 +96,99 @@ const Requests = () => {
   }
 
   return (
-    <div className="py-6 sm:py-8 lg:py-12">
-      {/* Header Section */}
-      <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-          Connection Requests 💌
+    <div className="max-w-3xl mx-auto px-4 pt-10 pb-20">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="font-['Outfit'] font-extrabold text-[28px] text-white tracking-tight mb-1">
+          Connection requests
         </h1>
-        <p className="text-base-content/70 text-lg">
+        <p className="text-[13px] text-[#6b6880]">
           {requests.length}{" "}
           {requests.length === 1 ? "person wants" : "people want"} to connect
           with you
         </p>
       </div>
 
-      {/* Requests List */}
-      <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
+      {/* List */}
+      <div className="flex flex-col gap-3">
         {requests.map((request) => {
           const { _id, firstName, lastName, about, photoUrl, age, gender } =
             request.fromUserId;
-          const isProcessing = processingRequests.has(request._id);
+          const isPending = processing.has(request._id);
 
           return (
             <div
               key={_id}
-              className="bg-base-200 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                {/* Profile Image */}
-                <div className="flex-shrink-0">
-                  <div className="avatar">
-                    <div className="w-16 sm:w-20 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                      <img
-                        src={photoUrl}
-                        alt={`${firstName}'s profile`}
-                        onError={(e) => {
-                          e.target.src =
-                            "https://via.placeholder.com/80x80?text=User";
-                        }}
-                      />
-                    </div>
-                  </div>
+              className="bg-[#13121c] border border-[#1e1d28] rounded-xl p-4 hover:border-[#2d2b40] transition-all">
+              <div className="flex items-center gap-4">
+                {/* Avatar */}
+                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-[#2d2b40]">
+                  <img
+                    src={photoUrl}
+                    alt={firstName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + " " + lastName)}&background=6d28d9&color=fff`;
+                    }}
+                  />
                 </div>
 
-                {/* Profile Info */}
+                {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                  <h2 className="font-['Outfit'] font-bold text-[15px] text-white">
                     {firstName} {lastName}
                   </h2>
-
-                  {age && gender && (
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <div className="badge badge-outline badge-lg">
-                        {age} years old
-                      </div>
-                      <div className="badge badge-outline badge-lg">
-                        {gender}
-                      </div>
-                    </div>
-                  )}
-
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {age && (
+                      <span className="text-[11px] text-[#6b6880]">
+                        {age} y/o
+                      </span>
+                    )}
+                    {gender && (
+                      <span className="text-[11px] text-[#4a4760]">
+                        · {gender}
+                      </span>
+                    )}
+                  </div>
                   {about && (
-                    <p className="text-base-content/70 text-sm sm:text-base line-clamp-2 pr-4">
+                    <p className="text-[12px] text-[#6b6880] line-clamp-1 mt-1">
                       {about}
                     </p>
                   )}
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:flex-shrink-0">
+                {/* Actions */}
+                <div className="flex gap-2 flex-shrink-0">
                   <button
-                    className={`btn btn-error btn-lg flex-1 sm:flex-none ${
-                      isProcessing ? "loading" : ""
-                    }`}
                     onClick={() => reviewRequest("rejected", request._id)}
-                    disabled={isProcessing}>
-                    {!isProcessing && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    )}
-                    {isProcessing ? "Processing..." : "Reject"}
+                    disabled={isPending}
+                    className="px-3 py-2 text-[12px] font-medium text-red-400 border border-red-900/60 bg-red-950/30 hover:bg-red-950/60 rounded-lg transition-all disabled:opacity-50 cursor-pointer">
+                    {isPending ? "..." : "Reject"}
                   </button>
-
                   <button
-                    className={`btn btn-success btn-lg flex-1 sm:flex-none ${
-                      isProcessing ? "loading" : ""
-                    }`}
                     onClick={() => reviewRequest("accepted", request._id)}
-                    disabled={isProcessing}>
-                    {!isProcessing && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        />
-                      </svg>
-                    )}
-                    {isProcessing ? "Processing..." : "Accept"}
+                    disabled={isPending}
+                    className="px-3 py-2 text-[12px] font-medium text-white bg-violet-700 hover:bg-violet-600 rounded-lg transition-all disabled:opacity-50 cursor-pointer border-none">
+                    {isPending ? "..." : "Accept"}
                   </button>
                 </div>
               </div>
 
-              {/* Request timestamp or additional info could go here */}
-              <div className="mt-4 pt-4 border-t border-base-300">
-                <p className="text-xs text-base-content/50 text-center">
-                  💡 Tip: Accept to start chatting, or reject to politely
-                  decline
-                </p>
-              </div>
+              <p className="text-[11px] text-[#4a4760] mt-3 text-center">
+                Accept to start chatting · Reject to decline
+              </p>
             </div>
           );
         })}
       </div>
 
-      {/* Refresh Button */}
-      <div className="text-center mt-12">
+      {/* Refresh */}
+      <div className="text-center mt-10">
         <button
-          className="btn btn-outline btn-lg"
           onClick={fetchRequests}
-          disabled={loading}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          Refresh Requests
+          disabled={loading}
+          className="px-5 py-2.5 border border-[#2d2b40] text-[#9b8ec4] hover:border-violet-800 hover:text-violet-300 text-[13px] rounded-lg transition-all cursor-pointer bg-transparent">
+          Refresh requests
         </button>
       </div>
     </div>
