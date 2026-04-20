@@ -20,7 +20,7 @@ export const notifyError = (msg) => {
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-    theme: "colored",
+    theme: "dark",
   });
 };
 

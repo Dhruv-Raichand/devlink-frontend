@@ -15,34 +15,31 @@ const Chat = () => {
   const userId = user?._id;
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const fetchChatMessages = async () => {
-    const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
-      withCredentials: true,
-    });
-
-    const chatMessages = chat?.data?.data?.messages.map((msg) => {
-      return {
-        firstName: msg.senderId.firstName,
-        lastName: msg.senderId.lastName,
-        photoUrl: msg.senderId.photoUrl,
-        text: msg.text,
-        createdAt: msg.createdAt,
-      };
-    });
-    setMessages(chatMessages);
-  };
-
   useEffect(() => {
+    const fetchChatMessages = async () => {
+      try {
+        const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
+          withCredentials: true,
+        });
+        setMessages(
+          chat?.data?.data?.messages.map((msg) => ({
+            firstName: msg.senderId.firstName,
+            lastName: msg.senderId.lastName,
+            photoUrl: msg.senderId.photoUrl,
+            text: msg.text,
+            createdAt: msg.createdAt,
+          })),
+        );
+      } catch (err) {
+        console.error("Failed to fetch messages:", err);
+      }
+    };
     fetchChatMessages();
-  }, []);
+  }, [targetUserId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -55,20 +52,17 @@ const Chat = () => {
     socket.on(
       "messageReceived",
       ({ firstName, lastName, photoUrl, text, createdAt }) => {
-        setMessages((messages) => [
-          ...messages,
+        setMessages((prev) => [
+          ...prev,
           { firstName, lastName, photoUrl, text, createdAt },
         ]);
       },
     );
-    return () => {
-      socket.disconnect();
-    };
+    return () => socket.disconnect();
   }, [userId, targetUserId]);
 
   const sendMessage = () => {
     if (!newMessage.trim()) return;
-
     const socket = createSocketConnection();
     socket.emit("sendMessage", {
       firstName: user?.firstName,
@@ -78,92 +72,106 @@ const Chat = () => {
       targetUserId,
       text: newMessage,
     });
-
     setNewMessage("");
   };
 
-  const handleKeyDown = (e) => {
-    // Send when pressing Enter (without Shift)
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // prevent new line
-      sendMessage();
-    }
-  };
-
-  const formatMessageTime = (date) => {
-    return new Date(date).toLocaleString("en-US", {
-      month: "short", // Jan, Feb, etc
-      day: "numeric", // 27
-      year: "numeric", // 2026
+  const formatTime = (date) =>
+    new Date(date).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     });
-  };
+
+  const getAvatar = (photoUrl, name) =>
+    photoUrl ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6d28d9&color=fff`;
 
   return (
-    <div className="w-[80vw] backdrop-blur-md bg-black/10 border mx-auto border-gray-600 rounded-2xl m-5 h-[80vh] flex flex-col">
-      <div className="flex gap-5 items-center px-5 py-3 border-b border-gray-600">
-        <div className="w-12 rounded-full">
-          <img
-            className="rounded-full"
-            alt="Tailwind CSS chat bubble component"
-            src={targetUser.photoUrl}
-          />
-        </div>
-        <h1 className=" text-xl font-bold">
-          {targetUser.firstName} {targetUser.lastName}
-        </h1>
+    <div className="max-w-3xl mx-auto px-4 pt-6 pb-6 h-[calc(100vh-58px)] flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-3 pb-4 border-b border-[#1e1d28] mb-4">
+        {targetUser && (
+          <>
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-[#2d2b40] flex-shrink-0">
+              <img
+                src={getAvatar(
+                  targetUser.photoUrl,
+                  `${targetUser.firstName} ${targetUser.lastName}`,
+                )}
+                alt={targetUser.firstName}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h1 className="font-['Outfit'] font-bold text-[15px] text-white">
+                {targetUser.firstName} {targetUser.lastName}
+              </h1>
+            </div>
+          </>
+        )}
       </div>
-      <div className="flex-1 overflow-y-scroll p-5">
-        {messages &&
-          messages.map((msg, index) => {
-            return (
-              <div
-                key={index}
-                className={
-                  "chat " +
-                  (msg?.firstName == user?.firstName ?
-                    " chat-end"
-                  : " chat-start")
-                }>
-                <div className="chat-image avatar">
-                  <div className="w-10 rounded-full">
-                    <img
-                      alt="Tailwind CSS chat bubble component"
-                      src={msg.photoUrl}
-                    />
-                  </div>
-                </div>
-                <div className="chat-header">
-                  {msg.firstName === user.firstName ?
-                    "You"
-                  : `${msg.firstName} ${msg.lastName}`}
-                  <time className="text-xs opacity-50">
-                    {formatMessageTime(msg?.createdAt)}
-                  </time>
-                </div>
-                <div className="chat-bubble">{msg.text}</div>
-                <div className="chat-footer opacity-50">Delivered</div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-1">
+        {messages.map((msg, index) => {
+          const isMe = msg.firstName === user?.firstName;
+          return (
+            <div
+              key={index}
+              className={`flex items-end gap-2 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+              {/* Avatar */}
+              <div className="w-7 h-7 rounded-full overflow-hidden border border-[#2d2b40] flex-shrink-0">
+                <img
+                  src={getAvatar(
+                    msg.photoUrl,
+                    `${msg.firstName} ${msg.lastName}`,
+                  )}
+                  alt={msg.firstName}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            );
-          })}
+              {/* Bubble */}
+              <div
+                className={`max-w-[70%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-1`}>
+                <div
+                  className={`px-3.5 py-2.5 rounded-2xl text-[13px] leading-relaxed ${
+                    isMe ?
+                      "bg-violet-700 text-white rounded-br-sm"
+                    : "bg-[#1a1928] border border-[#2d2b40] text-[#e8e6f0] rounded-bl-sm"
+                  }`}>
+                  {msg.text}
+                </div>
+                <span className="text-[10px] text-[#4a4760] px-1">
+                  {isMe ? "You" : msg.firstName} ·{" "}
+                  {msg.createdAt ? formatTime(msg.createdAt) : ""}
+                </span>
+              </div>
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
-      <div className="flex items-center gap-2 p-3 border-t border-white/20 bg-transparent sm:p-4">
+
+      {/* Input */}
+      <div className="flex gap-2 pt-4 border-t border-[#1e1d28] mt-4">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          }}
           placeholder="Type a message..."
-          className="flex-1 bg-white/20 text-white placeholder-white/70 rounded-full px-4 py-2 
-               focus:outline-none focus:ring-2 focus:ring-white/40 transition w-full 
-               text-sm sm:text-base"
+          className="flex-1 bg-[#13121c] border border-[#2d2b40] text-[#e8e6f0] placeholder-[#3a3850] rounded-lg px-4 py-2.5 text-[13px] focus:outline-none focus:border-violet-600 transition-colors"
         />
         <button
           onClick={sendMessage}
-          className="btn btn-secondary px-4 py-2 rounded-full transition active:scale-95 text-sm sm:text-base">
+          className="px-4 py-2.5 bg-violet-700 hover:bg-violet-600 text-white text-[13px] font-medium rounded-lg transition-all cursor-pointer border-none flex-shrink-0">
           Send
         </button>
       </div>

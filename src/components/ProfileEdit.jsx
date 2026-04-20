@@ -7,6 +7,41 @@ import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess } from "../utils/toast";
 
+const PREDEFINED_SKILLS = [
+  "React",
+  "Node.js",
+  "TypeScript",
+  "JavaScript",
+  "Python",
+  "Go",
+  "Rust",
+  "Java",
+  "C++",
+  "Swift",
+  "Kotlin",
+  "Docker",
+  "Kubernetes",
+  "AWS",
+  "GraphQL",
+  "MongoDB",
+  "PostgreSQL",
+  "Next.js",
+  "Vue",
+  "Flutter",
+  "DevOps",
+];
+
+const GENDER_OPTIONS = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "others", label: "Other" },
+];
+
+const inputCls =
+  "w-full bg-[#13121c] border border-[#2d2b40] text-[#e8e6f0] placeholder-[#3a3850] rounded-lg px-3 py-2.5 text-[13px] focus:outline-none focus:border-violet-600 transition-colors";
+const labelCls =
+  "block text-[11px] text-[#6b6880] uppercase tracking-wider mb-1.5";
+
 const ProfileEdit = ({ user }) => {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
@@ -14,16 +49,15 @@ const ProfileEdit = ({ user }) => {
   const [photoUrl, setPhotoUrl] = useState(user?.photoUrl || "");
   const [age, setAge] = useState(user?.age || "");
   const [gender, setGender] = useState(user?.gender || "");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [previewImage, setPreviewImage] = useState(user?.photoUrl || "");
   const [skills, setSkills] = useState(user?.skills || []);
-  const [skillInput, setSkillInput] = useState("");
+  const [customSkill, setCustomSkill] = useState("");
+  const [previewImage, setPreviewImage] = useState(user?.photoUrl || "");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const originalDataRef = useRef({
+  const original = useRef({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     about: user?.about || "",
@@ -34,7 +68,7 @@ const ProfileEdit = ({ user }) => {
   });
 
   const hasChanges =
-    JSON.stringify(originalDataRef.current) !==
+    JSON.stringify(original.current) !==
     JSON.stringify({
       firstName,
       lastName,
@@ -45,15 +79,29 @@ const ProfileEdit = ({ user }) => {
       skills,
     });
 
-  const handleProfileEdit = async () => {
+  const toggleSkill = (skill) => {
+    setSkills((prev) =>
+      prev.includes(skill) ? prev.filter((s) => s !== skill)
+      : prev.length < 10 ? [...prev, skill]
+      : prev,
+    );
+  };
+
+  const addCustomSkill = () => {
+    const s = customSkill.trim();
+    if (s && !skills.includes(s) && skills.length < 10) {
+      setSkills([...skills, s]);
+      setCustomSkill("");
+    }
+  };
+
+  const handleSave = async () => {
+    if (!hasChanges) {
+      notifyError("No changes detected");
+      return;
+    }
     setIsLoading(true);
     try {
-      if (!hasChanges) {
-        notifyError("No Changes Detected");
-        setIsLoading(false);
-        return;
-      }
-
       const res = await axios.patch(
         BASE_URL + "/profile/edit",
         {
@@ -62,321 +110,240 @@ const ProfileEdit = ({ user }) => {
           about,
           photoUrl,
           age: age ? parseInt(age) : undefined,
-          gender: gender ? gender : undefined,
+          gender: gender || undefined,
           skills,
         },
         { withCredentials: true },
       );
       notifySuccess(res?.data?.message);
       dispatch(addUser(res.data.data));
+      original.current = {
+        firstName,
+        lastName,
+        about,
+        photoUrl,
+        age,
+        gender,
+        skills,
+      };
     } catch (err) {
       notifyError(err.response?.data?.message || "Something went wrong");
-      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleImageChange = (url) => {
-    setPhotoUrl(url);
-    setPreviewImage(url);
-  };
-
-  const genderOptions = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "others", label: "Other" },
-  ];
-
   return (
-    <div className="p-4 sm:p-6">
-      {/* <ToastContainer /> */}
+    <div className="max-w-6xl mx-auto px-4 pt-10 pb-20">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="font-['Outfit'] font-extrabold text-[28px] text-white tracking-tight mb-1">
+          Edit profile
+        </h1>
+        <p className="text-[13px] text-[#6b6880]">
+          Update your info and skills
+        </p>
+      </div>
 
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Edit Your Profile
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Update your information and see how it looks
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Edit Form */}
-          <div className="bg-white dark:bg-gray-800 backdrop-blur-lg bg-opacity-90 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
-              <h2 className="text-2xl font-bold text-white flex items-center">
-                <svg
-                  className="w-6 h-6 mr-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Profile Information
-              </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+        {/* ── Form ── */}
+        <div className="bg-[#13121c] border border-[#1e1d28] rounded-xl p-6 flex flex-col gap-5">
+          {/* Name */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>First name</label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className={inputCls}
+                placeholder="John"
+              />
             </div>
-
-            <div className="p-6 sm:p-8 space-y-6">
-              {/* Name Fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Enter first name"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Enter last name"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
-                  />
-                </div>
-              </div>
-
-              {/* Photo URL */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Profile Photo URL
-                </label>
-                <input
-                  type="url"
-                  value={photoUrl}
-                  onChange={(e) => handleImageChange(e.target.value)}
-                  placeholder="https://example.com/photo.jpg"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
-                />
-                {previewImage && (
-                  <div className="mt-3">
-                    <img
-                      src={previewImage}
-                      alt="Preview"
-                      className="w-20 h-20 rounded-full object-cover border-4 border-blue-200 dark:border-blue-700"
-                      onError={() => setPreviewImage("")}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Age and Gender */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Age
-                  </label>
-                  <input
-                    type="number"
-                    min="18"
-                    max="100"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    placeholder="25"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Gender
-                  </label>
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 text-left flex items-center justify-between">
-                      <span
-                        className={
-                          gender ? "" : "text-gray-500 dark:text-gray-400"
-                        }>
-                        {gender ?
-                          genderOptions.find((opt) => opt.value === gender)
-                            ?.label
-                        : "Select gender"}
-                      </span>
-                      <svg
-                        className={`w-5 h-5 transition-transform duration-200 ${
-                          isDropdownOpen ? "transform rotate-180" : ""
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-
-                    {isDropdownOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-                        {genderOptions.map((option) => (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => {
-                              setGender(option.value);
-                              setIsDropdownOpen(false);
-                            }}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg">
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* About */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  About Me
-                </label>
-                <textarea
-                  value={about}
-                  onChange={(e) => setAbout(e.target.value)}
-                  placeholder="Tell others about yourself..."
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none transition-all duration-200"
-                  maxLength={500}
-                />
-                <div className="text-right">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {about?.length || 0}/500
-                  </span>
-                </div>
-              </div>
-
-              {/* Skills */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Skills
-                </label>
-
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    placeholder="Add a skill"
-                    className="flex-1 px-4 py-2 border rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (
-                        skillInput &&
-                        skills.length < 10 &&
-                        !skills.includes(skillInput)
-                      ) {
-                        setSkills([...skills, skillInput]);
-                        setSkillInput("");
-                      }
-                    }}
-                    className="bg-blue-500 text-white px-4 rounded-lg">
-                    Add
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="bg-gray-600 px-3 py-1 rounded-full flex items-center gap-2">
-                      {skill}
-                      <button
-                        onClick={() =>
-                          setSkills(skills.filter((_, i) => i !== index))
-                        }>
-                        ❌
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Save Button */}
-              <div className="flex gap-4">
-                <button
-                  onClick={() => navigate("/")}
-                  className="w-1/2 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200">
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleProfileEdit}
-                  disabled={isLoading || !hasChanges}
-                  className="w-1/2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 disabled:opacity-50">
-                  {isLoading ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Preview Card */}
-          <div className="lg:sticky lg:top-6">
-            <div className="mb-4">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-                Live Preview
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                This is how your profile will appear to others
-              </p>
-            </div>
-
-            <div className="flex justify-center p-6 items-center">
-              <UserCard
-                user={{
-                  firstName,
-                  lastName,
-                  about,
-                  photoUrl: previewImage,
-                  age,
-                  gender,
-                  skills,
-                }}
+            <div>
+              <label className={labelCls}>Last name</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className={inputCls}
+                placeholder="Doe"
               />
             </div>
           </div>
+
+          {/* Photo URL */}
+          <div>
+            <label className={labelCls}>Profile photo URL</label>
+            <input
+              type="url"
+              value={photoUrl}
+              onChange={(e) => {
+                setPhotoUrl(e.target.value);
+                setPreviewImage(e.target.value);
+              }}
+              className={inputCls}
+              placeholder="https://example.com/photo.jpg"
+            />
+            {previewImage && (
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="w-10 h-10 rounded-full object-cover border border-[#2d2b40] mt-2"
+                onError={() => setPreviewImage("")}
+              />
+            )}
+          </div>
+
+          {/* Age + Gender */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>Age</label>
+              <input
+                type="number"
+                min="18"
+                max="100"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className={inputCls}
+                placeholder="25"
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Gender</label>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className={inputCls + " cursor-pointer"}>
+                <option value="">Select</option>
+                {GENDER_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* About */}
+          <div>
+            <label className={labelCls}>About me</label>
+            <textarea
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+              rows={3}
+              maxLength={500}
+              placeholder="Tell others about yourself..."
+              className={inputCls + " resize-none"}
+            />
+            <p className="text-[11px] text-[#4a4760] text-right mt-1">
+              {about?.length || 0}/500
+            </p>
+          </div>
+
+          {/* Skills */}
+          <div>
+            <label className={labelCls}>
+              Skills{" "}
+              <span className="normal-case text-[#4a4760]">
+                ({skills.length}/10)
+              </span>
+            </label>
+            {/* Predefined chips */}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {PREDEFINED_SKILLS.map((skill) => (
+                <button
+                  key={skill}
+                  type="button"
+                  onClick={() => toggleSkill(skill)}
+                  className={`text-[12px] px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+                    skills.includes(skill) ?
+                      "border-violet-600 bg-violet-950/40 text-violet-300"
+                    : "border-[#2d2b40] bg-[#0d0c16] text-[#6b6880] hover:border-[#4a4760] hover:text-[#9b8ec4]"
+                  }`}>
+                  {skill}
+                </button>
+              ))}
+            </div>
+            {/* Custom skill input */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={customSkill}
+                onChange={(e) => setCustomSkill(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomSkill();
+                  }
+                }}
+                placeholder="Add custom skill..."
+                className={inputCls + " flex-1"}
+              />
+              <button
+                type="button"
+                onClick={addCustomSkill}
+                className="px-4 py-2 bg-[#1a1928] border border-[#2d2b40] text-[#9b8ec4] hover:border-violet-700 hover:text-violet-300 text-[12px] rounded-lg transition-all cursor-pointer">
+                Add
+              </button>
+            </div>
+            {/* Selected custom skills not in predefined */}
+            {skills.filter((s) => !PREDEFINED_SKILLS.includes(s)).length >
+              0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {skills
+                  .filter((s) => !PREDEFINED_SKILLS.includes(s))
+                  .map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border border-violet-600 bg-violet-950/40 text-violet-300">
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSkills(skills.filter((s) => s !== skill))
+                        }
+                        className="text-violet-400 hover:text-white cursor-pointer bg-transparent border-none p-0 leading-none">
+                        ×
+                      </button>
+                    </span>
+                  ))}
+              </div>
+            )}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={() => navigate("/app")}
+              className="flex-1 py-2.5 border border-[#2d2b40] text-[#6b6880] hover:text-[#9b8ec4] hover:border-[#4a4760] text-[13px] rounded-lg transition-all cursor-pointer bg-transparent">
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isLoading || !hasChanges}
+              className="flex-1 py-2.5 bg-violet-700 hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-[13px] rounded-lg transition-all cursor-pointer border-none">
+              {isLoading ? "Saving..." : "Save changes"}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Live Preview ── */}
+        <div className="lg:sticky lg:top-20 self-start">
+          <p className="text-[11px] text-[#4a4760] uppercase tracking-wider mb-3">
+            Live preview
+          </p>
+          <UserCard
+            user={{
+              firstName,
+              lastName,
+              about,
+              photoUrl: previewImage,
+              age,
+              gender,
+              skills,
+            }}
+          />
         </div>
       </div>
     </div>
