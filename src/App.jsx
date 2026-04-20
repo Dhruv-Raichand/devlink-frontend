@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import Feed from "./components/Feed";
 import Requests from "./components/Requests";
 import Chat from "./components/Chat";
-// import ChatInbox from "./components/ChatInbox";
+import ChatInbox from "./components/ChatInbox";
 // import ViewProfile from "./components/ViewProfile";
 import NotFound from "./components/NotFound";
 import { ToastContainer, Flip } from "react-toastify";
@@ -63,7 +63,7 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="connections" element={<Connections />} />
               <Route path="requests" element={<Requests />} />
-              {/* <Route path="messages" element={<ChatInbox />} /> */}
+              <Route path="messages" element={<ChatInbox />} />
               <Route path="messages/:targetUserId" element={<Chat />} />
               {/* <Route path="profile/:userId" element={<ViewProfile />} /> */}
             </Route>

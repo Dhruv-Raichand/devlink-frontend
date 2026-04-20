@@ -52,7 +52,7 @@ const NavBar = () => {
     { to: "/app", label: "Home" },
     { to: "/app/connections", label: "Connections" },
     { to: "/app/requests", label: "Requests" },
-    // { to: "/app/messages", label: "Messages" },
+    { to: "/app/messages", label: "Messages" },
   ];
 
   return (
