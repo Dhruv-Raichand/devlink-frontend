@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { createSocketConnection } from "../utils/socket";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -93,7 +93,10 @@ const Chat = () => {
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 border-b border-[#1e1d28] mb-4">
         {targetUser && (
-          <>
+          <Link
+            to={`/app/profile/${targetUserId}`}
+            state={{ targetUser }}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity no-underline">
             <div className="w-9 h-9 rounded-full overflow-hidden border border-[#2d2b40] flex-shrink-0">
               <img
                 src={getAvatar(
@@ -108,8 +111,9 @@ const Chat = () => {
               <h1 className="font-['Outfit'] font-bold text-[15px] text-white">
                 {targetUser.firstName} {targetUser.lastName}
               </h1>
+              <p className="text-[11px] text-[#6b6880]">View profile</p>
             </div>
-          </>
+          </Link>
         )}
       </div>
 

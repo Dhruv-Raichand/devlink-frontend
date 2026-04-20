@@ -93,16 +93,18 @@ const Connections = () => {
               key={_id}
               className="bg-[#13121c] border border-[#1e1d28] rounded-xl overflow-hidden hover:border-[#3730a3] transition-all duration-200 flex flex-col">
               {/* Photo */}
-              <div className="h-44 bg-[#1a1928] overflow-hidden">
-                <img
-                  src={photoUrl}
-                  alt={firstName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + " " + lastName)}&background=6d28d9&color=fff&size=300`;
-                  }}
-                />
-              </div>
+              <Link to={`/app/profile/${_id}`} state={{ targetUser: c }}>
+                <div className="h-44 bg-[#1a1928] overflow-hidden">
+                  <img
+                    src={photoUrl}
+                    alt={firstName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + " " + lastName)}&background=6d28d9&color=fff&size=300`;
+                    }}
+                  />
+                </div>
+              </Link>
 
               {/* Info */}
               <div className="p-4 flex flex-col flex-1">
@@ -148,9 +150,23 @@ const Connections = () => {
                     className="flex-1 py-2 bg-violet-700 hover:bg-violet-600 text-white text-[12px] font-medium rounded-lg transition-all text-center">
                     Message
                   </Link>
-                  <button className="w-8 h-8 flex items-center justify-center border border-[#2d2b40] rounded-lg text-[#6b6880] hover:text-[#e8e6f0] hover:border-[#4a4760] transition-all cursor-pointer bg-transparent text-[16px]">
-                    ···
-                  </button>
+                  <Link
+                    to={`/app/profile/${_id}`}
+                    state={{ targetUser: c }}
+                    className="w-8 h-8 flex items-center justify-center border border-[#2d2b40] rounded-lg text-[#6b6880] hover:text-[#e8e6f0] hover:border-[#4a4760] transition-all">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </Link>
                 </div>
               </div>
             </div>

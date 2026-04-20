@@ -9,7 +9,7 @@ import Feed from "./components/Feed";
 import Requests from "./components/Requests";
 import Chat from "./components/Chat";
 import ChatInbox from "./components/ChatInbox";
-// import ViewProfile from "./components/ViewProfile";
+import ViewProfile from "./components/ViewProfile";
 import NotFound from "./components/NotFound";
 import { ToastContainer, Flip } from "react-toastify";
 import AuthLoader from "./components/AuthLoader";
@@ -65,7 +65,7 @@ function App() {
               <Route path="requests" element={<Requests />} />
               <Route path="messages" element={<ChatInbox />} />
               <Route path="messages/:targetUserId" element={<Chat />} />
-              {/* <Route path="profile/:userId" element={<ViewProfile />} /> */}
+              <Route path="profile/:userId" element={<ViewProfile />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
