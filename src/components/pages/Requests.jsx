@@ -1,11 +1,11 @@
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addRequest, removeRequest } from "../utils/requestSlice";
-import { notifySuccess, notifyError } from "../utils/toast";
-import LoadingSpinner from "./LoadingSpinner";
-import ErrorMessage from "./ErrorMessage";
+import { addRequest, removeRequest } from "../../store/requestSlice";
+import { notifySuccess, notifyError } from "../../utils/toast";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorMessage from "../ui/ErrorMessage";
 import { Link } from "react-router-dom";
 
 const Requests = () => {

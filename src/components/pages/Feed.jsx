@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL } from "../../utils/constants";
 import { useEffect, useState } from "react";
-import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
+import { addFeed, removeUserFromFeed } from "../../store/feedSlice";
 import SwipeableCard from "./SwipeableCard";
-import LoadingSpinner from "./LoadingSpinner";
-import ErrorMessage from "./ErrorMessage";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorMessage from "../ui/ErrorMessage";
 
 const Feed = () => {
   const feed = useSelector((state) => state.feed);

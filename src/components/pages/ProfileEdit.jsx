@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
-import UserCard from "./UserCard";
+import UserCard from "../ui/UserCard";
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL } from "../../utils/constants";
 import { useDispatch } from "react-redux";
-import { addUser } from "../utils/userSlice";
+import { addUser } from "../../store/userSlice";
 import { useNavigate } from "react-router-dom";
-import { notifyError, notifySuccess } from "../utils/toast";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
 const PREDEFINED_SKILLS = [
   "React",

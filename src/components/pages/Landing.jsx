@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import NavBar from "./NavBar";
+import NavBar from "../layout/NavBar";
 
 const SKILLS = [
   "React",

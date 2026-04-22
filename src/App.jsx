@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "./components/Landing";
-import Login from "./components/Login";
-import Profile from "./components/Profile";
-import Connections from "./components/Connections";
-import appStore from "./utils/appStore";
+import Landing from "./components/pages/Landing";
+import Login from "./components/pages/Login";
+import Profile from "./components/pages/Profile";
+import Connections from "./components/pages/Connections";
+import appStore from "./store/appStore";
 import { Provider } from "react-redux";
-import Feed from "./components/Feed";
-import Requests from "./components/Requests";
-import Chat from "./components/Chat";
-import ChatInbox from "./components/ChatInbox";
-import ViewProfile from "./components/ViewProfile";
-import NotFound from "./components/NotFound";
+import Feed from "./components/pages/Feed";
+import Requests from "./components/pages/Requests";
+import Chat from "./components/pages/Chat";
+import ChatInbox from "./components/pages/ChatInbox";
+import ViewProfile from "./components/pages/ViewProfile";
+import NotFound from "./components/pages/NotFound";
 import { ToastContainer, Flip } from "react-toastify";
-import AuthLoader from "./components/AuthLoader";
-import PublicRoute from "./components/PublicRoutes";
-import ProtectedRoute from "./components/ProtectedRoutes";
-import Layout from "./components/Layout";
+import AuthLoader from "./components/layout/AuthLoader";
+import PublicRoute from "./components/layout/PublicRoutes";
+import ProtectedRoute from "./components/layout/ProtectedRoutes";
+import Layout from "./components/layout/Layout";
 
 function App() {
   return (

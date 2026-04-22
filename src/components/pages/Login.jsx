@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { addUser } from "../utils/userSlice";
-import { BASE_URL } from "../utils/constants";
+import { addUser } from "../../store/userSlice";
+import { BASE_URL } from "../../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { notifyError, notifySuccess } from "../utils/toast";
-import NavBar from "./NavBar";
+import { notifyError, notifySuccess } from "../../utils/toast";
+import NavBar from "../layout/NavBar";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");

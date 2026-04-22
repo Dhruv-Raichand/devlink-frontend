@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
-import LoadingSpinner from "./LoadingSpinner";
-import ErrorMessage from "./ErrorMessage";
+import { BASE_URL } from "../../utils/constants";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorMessage from "../ui/ErrorMessage";
 
 const ViewProfile = () => {
   const { userId } = useParams();

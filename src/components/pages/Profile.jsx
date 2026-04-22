@@ -1,6 +1,6 @@
 import ProfileEdit from "./ProfileEdit";
 import { useSelector } from "react-redux";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const Profile = () => {
   const user = useSelector((state) => state.user);

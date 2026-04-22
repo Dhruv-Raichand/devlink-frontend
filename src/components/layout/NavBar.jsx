@@ -1,9 +1,9 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
-import { removeUser } from "../utils/userSlice";
-import { notifyError, notifySuccess } from "../utils/toast";
+import { BASE_URL } from "../../utils/constants";
+import { removeUser } from "../../store/userSlice";
+import { notifyError, notifySuccess } from "../../utils/toast";
 import { useState, useEffect, useRef } from "react";
 
 const NavBar = () => {
