@@ -1,6 +1,5 @@
-import axios from "axios";
+import api from "../../utils/api";
 import { useDispatch, useSelector } from "react-redux";
-import { BASE_URL } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import { addFeed, removeUserFromFeed } from "../../store/feedSlice";
 import SwipeableCard from "./SwipeableCard";
@@ -19,9 +18,7 @@ const Feed = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get(BASE_URL + "/feed", {
-        withCredentials: true,
-      });
+      const res = await api.get("/feed");
       dispatch(addFeed(res.data?.data?.data ?? res.data?.data ?? []));
       setTotalCount(
         res.data?.data?.pagination?.totalUsers ??
@@ -39,11 +36,7 @@ const Feed = () => {
     if (!userId || isProcessing) return;
     try {
       setIsProcessing(true);
-      await axios.post(
-        `${BASE_URL}/request/send/${status}/${userId}`,
-        {},
-        { withCredentials: true },
-      );
+      await api.post(`/request/send/${status}/${userId}`);
       dispatch(removeUserFromFeed(userId));
       setTotalCount((prev) => Math.max(0, prev - 1));
     } catch (err) {

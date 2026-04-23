@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { BASE_URL } from "../../utils/constants";
+import api from "../../utils/api";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 
@@ -28,8 +27,8 @@ const ChatInbox = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios
-      .get(BASE_URL + "/chat/recent", { withCredentials: true })
+    api
+      .get("/chat/recent")
       .then((res) => setChats(res.data?.data || []))
       .catch((err) =>
         setError(

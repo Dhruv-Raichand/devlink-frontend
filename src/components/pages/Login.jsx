@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../../store/userSlice";
-import { BASE_URL } from "../../utils/constants";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import NavBar from "../layout/NavBar";
@@ -24,11 +23,12 @@ const Login = () => {
   const handleSignUp = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post(
-        BASE_URL + "/signup",
-        { firstName, lastName, emailId, password },
-        { withCredentials: true },
-      );
+      const res = await api.post("/signup", {
+        firstName,
+        lastName,
+        emailId,
+        password,
+      });
       notifySuccess("Registration Successful!");
       dispatch(addUser(res?.data?.data));
       return navigate("/app/profile");
@@ -43,11 +43,7 @@ const Login = () => {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post(
-        BASE_URL + "/login",
-        { emailId, password },
-        { withCredentials: true },
-      );
+      const res = await api.post("/login", { emailId, password });
       notifySuccess("Login Successful!");
       dispatch(addUser(res?.data?.data));
       return navigate("/app");

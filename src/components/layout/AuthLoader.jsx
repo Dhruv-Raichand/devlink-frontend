@@ -1,8 +1,6 @@
-// AuthLoader.jsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { BASE_URL } from "../../utils/constants";
+import api from "../../utils/api";
 import { addUser } from "../../store/userSlice";
 
 const AuthLoader = ({ children }) => {
@@ -17,12 +15,10 @@ const AuthLoader = ({ children }) => {
       return;
     }
 
-    axios
-      .get(BASE_URL + "/profile", { withCredentials: true })
+    api
+      .get("/profile")
       .then((res) => dispatch(addUser(res.data.data)))
       .catch((err) => {
-        // 401 = not logged in — silent redirect is fine
-        // anything else = server is likely down
         if (err?.response?.status !== 401 && !err?.response) {
           setServerDown(true);
         }

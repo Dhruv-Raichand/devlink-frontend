@@ -1,7 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { BASE_URL } from "../../utils/constants";
+import api from "../../utils/api";
 import { removeUser } from "../../store/userSlice";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import { useState, useEffect, useRef } from "react";
@@ -20,7 +19,7 @@ const NavBar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
+      await api.post("/logout");
       notifySuccess("Logged out successfully!");
       dispatch(removeUser());
       setProfileMenuOpen(false);

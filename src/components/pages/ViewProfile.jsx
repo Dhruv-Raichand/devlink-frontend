@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
-import { BASE_URL } from "../../utils/constants";
+import api from "../../utils/api";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 
@@ -20,8 +19,8 @@ const ViewProfile = () => {
     if (location.state?.targetUser) return;
 
     setLoading(true);
-    axios
-      .get(`${BASE_URL}/profile/${userId}`, { withCredentials: true })
+    api
+      .get(`/profile/${userId}`)
       .then((res) => setUser(res.data.data))
       .catch((err) =>
         setError(err?.response?.data?.message || "Failed to load profile"),

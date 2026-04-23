@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import UserCard from "../ui/UserCard";
-import axios from "axios";
-import { BASE_URL } from "../../utils/constants";
+import api from "../../utils/api";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../store/userSlice";
 import { useNavigate } from "react-router-dom";
@@ -102,19 +101,15 @@ const ProfileEdit = ({ user }) => {
     }
     setIsLoading(true);
     try {
-      const res = await axios.patch(
-        BASE_URL + "/profile/edit",
-        {
-          firstName,
-          lastName,
-          about,
-          photoUrl,
-          age: age ? parseInt(age) : undefined,
-          gender: gender || undefined,
-          skills,
-        },
-        { withCredentials: true },
-      );
+      const res = await api.patch("/profile/edit", {
+        firstName,
+        lastName,
+        about,
+        photoUrl,
+        age: age ? parseInt(age) : undefined,
+        gender: gender || undefined,
+        skills,
+      });
       notifySuccess(res?.data?.message);
       dispatch(addUser(res.data.data));
       original.current = {

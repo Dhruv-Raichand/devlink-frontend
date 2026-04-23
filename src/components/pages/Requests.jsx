@@ -1,5 +1,4 @@
-import axios from "axios";
-import { BASE_URL } from "../../utils/constants";
+import api from "../../utils/api";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequest, removeRequest } from "../../store/requestSlice";
@@ -19,9 +18,7 @@ const Requests = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get(BASE_URL + "/user/requests/received", {
-        withCredentials: true,
-      });
+      const res = await api.get("/user/requests/received");
       dispatch(addRequest(res.data?.data || []));
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to load requests");
@@ -34,11 +31,7 @@ const Requests = () => {
     if (processing.has(requestId)) return;
     try {
       setProcessing((prev) => new Set(prev).add(requestId));
-      await axios.post(
-        `${BASE_URL}/request/review/${status}/${requestId}`,
-        {},
-        { withCredentials: true },
-      );
+      await api.post(`/request/review/${status}/${requestId}`);
       dispatch(removeRequest(requestId));
       notifySuccess(`Request ${status} successfully!`);
     } catch (err) {
