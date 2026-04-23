@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import NavBar from "../layout/NavBar";
+import Footer from "../layout/Footer";
 
 const SKILLS = [
   "React",
@@ -236,28 +237,7 @@ export default function Landing() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-[#1e1d28] px-10 py-7 flex items-center justify-between flex-wrap gap-4 bg-[#0d0c16]">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-[7px] overflow-hidden flex items-center justify-center">
-            <img src="/devlink.png" className="w-full h-full object-contain" />
-          </div>
-          <span className="font-['Outfit'] font-bold text-sm text-white">
-            DevLink
-          </span>
-          <span className="text-xs text-[#4a4760] ml-2">
-            © 2026 · All rights reserved
-          </span>
-        </div>
-        <div className="flex gap-5">
-          {["Twitter", "GitHub", "LinkedIn"].map((s) => (
-            <span
-              key={s}
-              className="text-xs text-[#4a4760] cursor-pointer hover:text-[#9b8ec4] transition-colors">
-              {s}
-            </span>
-          ))}
-        </div>
-      </footer>
+      <Footer />
 
       {/* Only 2 keyframes that Tailwind can't do natively */}
       <style>{`
