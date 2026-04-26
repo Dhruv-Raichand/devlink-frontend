@@ -13,6 +13,8 @@ const NavBar = () => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   const dropdownRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
@@ -29,6 +31,15 @@ const NavBar = () => {
       console.log(err);
       notifyError("Logout failed. Please try again.");
     }
+  };
+
+  const getAvatar = () => {
+    if (imageError || !user.photoUrl) {
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        `${user.firstName} ${user.lastName}`,
+      )}&background=6d28d9&color=fff&size=400`;
+    }
+    return user.photoUrl;
   };
 
   // Close dropdown on outside click
@@ -117,14 +128,10 @@ const NavBar = () => {
                   className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#2d2b40] hover:border-violet-600 transition-colors cursor-pointer flex-shrink-0"
                   aria-label="Profile menu">
                   <img
-                    src={user.photoUrl}
+                    src={getAvatar()}
                     alt={user.firstName}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        user.firstName + " " + user.lastName,
-                      )}&background=6d28d9&color=fff`;
-                    }}
+                    onError={() => setImageError(true)}
                   />
                 </button>
 
