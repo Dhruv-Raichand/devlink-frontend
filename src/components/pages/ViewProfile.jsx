@@ -23,7 +23,9 @@ const ViewProfile = () => {
   const [githubLoading, setGithubLoading] = useState(false);
 
   useEffect(() => {
-    if (location.state?.targetUser) return;
+    if (location.state?.targetUser) {
+      setUser(location.state.targetUser); // show instant UI
+    }
     setLoading(true);
     api
       .get(`/profile/${userId}`)
