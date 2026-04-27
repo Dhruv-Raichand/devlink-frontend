@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 import { notifySuccess, notifyError } from "../../utils/toast";
+import InlineBanner from "../ui/Inlinebanner";
 
 const Connections = () => {
   const dispatch = useDispatch();
@@ -103,6 +104,12 @@ const Connections = () => {
           {connections.length === 1 ? "connection" : "connections"} found
         </p>
       </div>
+
+      <InlineBanner
+        id="connections_explain"
+        message="These are your mutual matches. Click Message to start a conversation or view their profile."
+        type="info"
+      />
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
