@@ -2,19 +2,23 @@ import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../../store/userSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import NavBar from "../layout/NavBar";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoginMode, setIsLoginMode] = useState(true);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const location = useLocation();
+  const [isLoginMode, setIsLoginMode] = useState(
+    location.state?.mode !== "signup", // false = signup tab open
+  );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,7 +27,7 @@ const Login = () => {
   const handleSignUp = async () => {
     setIsLoading(true);
     try {
-      const res = await api.post("/signup", {
+      const res = await api.post("/auth/signup", {
         firstName,
         lastName,
         emailId,
@@ -42,7 +46,7 @@ const Login = () => {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const res = await api.post("/login", { emailId, password });
+      const res = await api.post("/auth/login", { emailId, password });
       notifySuccess("Login Successful!");
       dispatch(addUser(res?.data?.data));
       return navigate("/app");

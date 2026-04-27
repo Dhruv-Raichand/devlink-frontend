@@ -142,7 +142,7 @@ export default function Landing() {
 
           <div className="flex gap-3 justify-center flex-wrap [animation:fadeUp_0.6s_ease_0.5s_both]">
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/login", { state: { mode: "signup" } })}
               className="px-8 py-3.5 text-[15px] font-medium text-white bg-violet-700 rounded-lg hover:bg-violet-600 hover:-translate-y-px transition-all cursor-pointer">
               Start matching free
             </button>
