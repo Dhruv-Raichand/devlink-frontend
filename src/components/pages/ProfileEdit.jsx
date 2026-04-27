@@ -41,7 +41,7 @@ const inputCls =
 const labelCls =
   "block text-[11px] text-[#6b6880] uppercase tracking-wider mb-1.5";
 
-const ProfileEdit = ({ user }) => {
+const ProfileEdit = ({ user, onSaved }) => {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [about, setAbout] = useState(user?.about || "");
@@ -52,9 +52,23 @@ const ProfileEdit = ({ user }) => {
   const [customSkill, setCustomSkill] = useState("");
   const [previewImage, setPreviewImage] = useState(user?.photoUrl || "");
   const [isLoading, setIsLoading] = useState(false);
+  const [githubUsername, setGithubUsername] = useState(
+    user?.githubUsername || "",
+  );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const getSnapshot = () => ({
+    firstName,
+    lastName,
+    about,
+    photoUrl,
+    age,
+    gender,
+    skills,
+    githubUsername,
+  });
 
   const original = useRef({
     firstName: user?.firstName || "",
@@ -64,19 +78,11 @@ const ProfileEdit = ({ user }) => {
     age: user?.age || "",
     gender: user?.gender || "",
     skills: user?.skills || [],
+    githubUsername: user?.githubUsername || "",
   });
 
   const hasChanges =
-    JSON.stringify(original.current) !==
-    JSON.stringify({
-      firstName,
-      lastName,
-      about,
-      photoUrl,
-      age,
-      gender,
-      skills,
-    });
+    JSON.stringify(original.current) !== JSON.stringify(getSnapshot());
 
   const toggleSkill = (skill) => {
     setSkills((prev) =>
@@ -109,18 +115,12 @@ const ProfileEdit = ({ user }) => {
         age: age ? parseInt(age) : undefined,
         gender: gender || undefined,
         skills,
+        githubUsername: githubUsername.trim() || undefined,
       });
       notifySuccess(res?.data?.message);
       dispatch(addUser(res.data.data));
-      original.current = {
-        firstName,
-        lastName,
-        about,
-        photoUrl,
-        age,
-        gender,
-        skills,
-      };
+      original.current = getSnapshot();
+      onSaved?.(); // return to profile view if called from Profile.jsx
     } catch (err) {
       notifyError(err.response?.data?.message || "Something went wrong");
     } finally {
@@ -130,7 +130,6 @@ const ProfileEdit = ({ user }) => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-10 pb-20">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="font-['Outfit'] font-extrabold text-[28px] text-white tracking-tight mb-1">
           Edit profile
@@ -236,6 +235,23 @@ const ProfileEdit = ({ user }) => {
             </p>
           </div>
 
+          {/* GitHub username */}
+          <div>
+            <label className={labelCls}>GitHub username</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a4760] text-[13px] pointer-events-none">
+                github.com/
+              </span>
+              <input
+                type="text"
+                value={githubUsername}
+                onChange={(e) => setGithubUsername(e.target.value)}
+                placeholder="your-username"
+                className={inputCls + " pl-[100px]"}
+              />
+            </div>
+          </div>
+
           {/* Skills */}
           <div>
             <label className={labelCls}>
@@ -244,7 +260,6 @@ const ProfileEdit = ({ user }) => {
                 ({skills.length}/10)
               </span>
             </label>
-            {/* Predefined chips */}
             <div className="flex flex-wrap gap-1.5 mb-3">
               {PREDEFINED_SKILLS.map((skill) => (
                 <button
@@ -260,7 +275,6 @@ const ProfileEdit = ({ user }) => {
                 </button>
               ))}
             </div>
-            {/* Custom skill input */}
             <div className="flex gap-2">
               <input
                 type="text"
@@ -282,7 +296,6 @@ const ProfileEdit = ({ user }) => {
                 Add
               </button>
             </div>
-            {/* Selected custom skills not in predefined */}
             {skills.filter((s) => !PREDEFINED_SKILLS.includes(s)).length >
               0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">

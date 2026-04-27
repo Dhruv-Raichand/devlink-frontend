@@ -13,13 +13,17 @@ const NavBar = () => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   const dropdownRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
 
+  const isAuthPage = location.pathname === "/login";
+
   const handleLogout = async () => {
     try {
-      await api.post("/logout");
+      await api.post("/auth/logout");
       notifySuccess("Logged out successfully!");
       dispatch(removeUser());
       setProfileMenuOpen(false);
@@ -29,6 +33,15 @@ const NavBar = () => {
       console.log(err);
       notifyError("Logout failed. Please try again.");
     }
+  };
+
+  const getAvatar = () => {
+    if (imageError || !user.photoUrl) {
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        `${user.firstName} ${user.lastName}`,
+      )}&background=6d28d9&color=fff&size=400`;
+    }
+    return user.photoUrl;
   };
 
   // Close dropdown on outside click
@@ -71,19 +84,39 @@ const NavBar = () => {
         </Link>
 
         {/* ── Unauthenticated: right side buttons ── */}
-        {!user && (
+        {!user && !isAuthPage && (
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/login", { state: { mode: "login" } })}
               className="px-4 py-2 text-sm text-[#9b8ec4] border border-[#2d2b40] rounded-lg hover:border-violet-800 hover:text-violet-300 transition-all cursor-pointer bg-transparent">
               Sign in
             </button>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/login", { state: { mode: "signup" } })}
               className="px-4 py-2 text-sm font-medium text-white bg-violet-700 rounded-lg hover:bg-violet-600 transition-all cursor-pointer border-none">
               Get started
             </button>
           </div>
+        )}
+
+        {!user && isAuthPage && (
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-1.5 text-[13px] text-[#6b6880] hover:text-[#e8e6f0] transition-colors cursor-pointer bg-transparent border-none">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            Back to home
+          </button>
         )}
 
         {/* ── Authenticated: desktop nav + profile ── */}
@@ -117,14 +150,10 @@ const NavBar = () => {
                   className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#2d2b40] hover:border-violet-600 transition-colors cursor-pointer flex-shrink-0"
                   aria-label="Profile menu">
                   <img
-                    src={user.photoUrl}
+                    src={getAvatar()}
                     alt={user.firstName}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        user.firstName + " " + user.lastName,
-                      )}&background=6d28d9&color=fff`;
-                    }}
+                    onError={() => setImageError(true)}
                   />
                 </button>
 
