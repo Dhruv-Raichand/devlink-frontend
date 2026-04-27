@@ -31,7 +31,6 @@ const Login = () => {
       });
       notifySuccess("Registration Successful!");
       dispatch(addUser(res?.data?.data));
-      return navigate("/app/profile");
     } catch (err) {
       notifyError(err?.response?.data?.message || "Registration failed");
       setError(err?.response?.data?.message || "Registration failed");
@@ -61,7 +60,13 @@ const Login = () => {
     : firstName.trim() && lastName.trim() && emailId.trim() && password.trim();
 
   useEffect(() => {
-    if (user) navigate("/app");
+    if (user) {
+      const onboardingDone =
+        localStorage.getItem("onboarding_complete") === "true";
+      console.log("User logged in, onboarding done:", onboardingDone);
+
+      navigate(onboardingDone ? "/app" : "/app/onboarding");
+    }
   }, [user, navigate]);
 
   return (
