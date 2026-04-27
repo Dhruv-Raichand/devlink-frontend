@@ -6,6 +6,7 @@ import { notifySuccess, notifyError } from "../../utils/toast";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 import { Link } from "react-router-dom";
+import InlineBanner from "../ui/Inlinebanner";
 
 const Requests = () => {
   const dispatch = useDispatch();
@@ -175,6 +176,12 @@ const Requests = () => {
         />
         <TabButton id="sent" label="Sent" count={sentRequests?.length || 0} />
       </div>
+
+      <InlineBanner
+        id="requests_explain"
+        message="Received tab shows people who liked you. Sent tab shows requests you've sent — you can withdraw them anytime."
+        type="info"
+      />
 
       {/* ── RECEIVED TAB ── */}
       {tab === "received" && (
