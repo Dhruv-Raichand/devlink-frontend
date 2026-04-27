@@ -36,15 +36,16 @@ const GENDER_OPTIONS = [
   { value: "others", label: "Other" },
 ];
 
+// Consistent dark input — matches the rest of the app
 const inputCls =
-  "w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-[14px] focus:outline-none focus:border-violet-500 transition-colors";
+  "w-full bg-[#13121c] border border-[#2d2b40] text-[#e8e6f0] placeholder-[#3a3850] rounded-xl px-4 py-3 text-[14px] focus:outline-none focus:border-violet-600 transition-colors";
 const labelCls =
-  "block text-[12px] text-white/40 uppercase tracking-wider mb-2";
+  "block text-[11px] text-[#6b6880] uppercase tracking-wider mb-2";
 
 const STEPS = [
   {
     id: "basics",
-    title: "Let's set up your profile",
+    title: "Set up your profile",
     subtitle: "Your photo and basics help others decide to connect with you",
     emoji: "👋",
   },
@@ -71,25 +72,20 @@ const STEPS = [
 const Onboarding = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
   const { completeOnboarding } = useHints();
 
   const [step, setStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [direction, setDirection] = useState("forward"); // for animation hint
 
-  // Step 1 state
   const [photoUrl, setPhotoUrl] = useState(user?.photoUrl || "");
   const [previewImage, setPreviewImage] = useState(user?.photoUrl || "");
   const [age, setAge] = useState(user?.age || "");
   const [gender, setGender] = useState(user?.gender || "");
 
-  // Step 2 state
   const [skills, setSkills] = useState(user?.skills || []);
   const [customSkill, setCustomSkill] = useState("");
 
-  // Step 3 state
   const [about, setAbout] = useState(user?.about || "");
   const [githubUsername, setGithubUsername] = useState(
     user?.githubUsername || "",
@@ -131,7 +127,6 @@ const Onboarding = () => {
   };
 
   const next = async () => {
-    setDirection("forward");
     let ok = true;
 
     if (step === 0) {
@@ -152,33 +147,29 @@ const Onboarding = () => {
     if (ok) setStep((s) => Math.min(s + 1, 3));
   };
 
-  const skip = () => {
-    setDirection("forward");
-    setStep((s) => Math.min(s + 1, 3));
-  };
+  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const skip = () => setStep((s) => Math.min(s + 1, 3));
 
-  const canSkip = step < 3;
-  const isLastContent = step === 2;
   const isDone = step === 3;
+  const isLastContent = step === 2;
+  const canGoBack = step > 0 && !isDone;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
-      {/* Top progress */}
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col text-[#e8e6f0]">
+      {/* Progress bar */}
       {!isDone && (
-        <div className="fixed top-0 left-0 right-0 z-10">
-          <div className="h-0.5 bg-[#1e1d28]">
-            <div
-              className="h-full bg-violet-600 transition-all duration-700 ease-out"
-              style={{ width: `${((step + 1) / 4) * 100}%` }}
-            />
-          </div>
+        <div className="fixed top-0 left-0 right-0 z-10 h-0.5 bg-[#1e1d28]">
+          <div
+            className="h-full bg-violet-600 transition-all duration-700 ease-out"
+            style={{ width: `${((step + 1) / 4) * 100}%` }}
+          />
         </div>
       )}
 
-      {/* Navbar stub */}
+      {/* Nav */}
       <div className="flex items-center justify-between px-8 h-14 border-b border-[#1e1d28] mt-0.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-[7px] overflow-hidden">
+          <div className="w-7 h-7 rounded-[7px] overflow-hidden flex-shrink-0">
             <img src="/devlink.png" className="w-full h-full object-contain" />
           </div>
           <span className="font-['Outfit'] font-extrabold text-[18px] text-white tracking-tight">
@@ -197,10 +188,10 @@ const Onboarding = () => {
         <div className="w-full max-w-lg">
           {/* Step header */}
           <div className="text-center mb-8">
-            <div className="text-[48px] mb-4 leading-none">
+            <div className="text-[48px] mb-4 leading-none select-none">
               {STEPS[step].emoji}
             </div>
-            <h1 className="font-['Outfit'] font-extrabold text-[30px] text-white tracking-tight mb-2">
+            <h1 className="font-['Outfit'] font-extrabold text-[28px] text-white tracking-tight mb-2">
               {STEPS[step].title}
             </h1>
             <p className="text-[14px] text-[#6b6880] leading-relaxed max-w-sm mx-auto">
@@ -211,11 +202,10 @@ const Onboarding = () => {
           {/* ── Step 1: Basics ── */}
           {step === 0 && (
             <div className="bg-[#13121c] border border-[#1e1d28] rounded-2xl p-6 flex flex-col gap-5">
-              {/* Photo */}
               <div>
                 <label className={labelCls}>Profile photo URL</label>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#2d2b40] flex-shrink-0 bg-[#1a1928]">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border border-[#2d2b40] flex-shrink-0 bg-[#0d0c16]">
                     {previewImage ?
                       <img
                         src={previewImage}
@@ -224,8 +214,8 @@ const Onboarding = () => {
                       />
                     : <div className="w-full h-full flex items-center justify-center text-[#4a4760]">
                         <svg
-                          width="20"
-                          height="20"
+                          width="18"
+                          height="18"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -266,21 +256,27 @@ const Onboarding = () => {
                 </div>
                 <div>
                   <label className={labelCls}>Gender</label>
-                  <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className={inputCls + " cursor-pointer"}>
-                    <option value="">Select</option>
+                  {/* Custom gender selector — no native select weirdness */}
+                  <div className="flex gap-2">
                     {GENDER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() =>
+                          setGender(gender === o.value ? "" : o.value)
+                        }
+                        className={`flex-1 py-3 rounded-xl text-[13px] border transition-all cursor-pointer ${
+                          gender === o.value ?
+                            "border-violet-600 bg-violet-950/40 text-violet-300"
+                          : "border-[#2d2b40] bg-[#0d0c16] text-[#6b6880] hover:border-[#4a4760] hover:text-[#9b8ec4]"
+                        }`}>
                         {o.label}
-                      </option>
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
               </div>
 
-              {/* Context-aware hint */}
               {!photoUrl && (
                 <div className="flex items-start gap-2.5 bg-violet-950/20 border border-violet-900/40 rounded-xl px-4 py-3">
                   <svg
@@ -342,7 +338,7 @@ const Onboarding = () => {
                 <button
                   type="button"
                   onClick={addCustomSkill}
-                  className="px-3 py-2 bg-[#1a1928] border border-[#2d2b40] text-[#9b8ec4] hover:border-violet-700 text-[12px] rounded-xl transition-all cursor-pointer">
+                  className="px-4 py-3 bg-[#1a1928] border border-[#2d2b40] text-[#9b8ec4] hover:border-violet-700 hover:text-violet-300 text-[12px] rounded-xl transition-all cursor-pointer">
                   Add
                 </button>
               </div>
@@ -408,7 +404,7 @@ const Onboarding = () => {
                     value={githubUsername}
                     onChange={(e) => setGithubUsername(e.target.value)}
                     placeholder="your-username"
-                    className={inputCls + " pl-[108px]"}
+                    className={inputCls + " pl-[110px]"}
                   />
                 </div>
               </div>
@@ -427,9 +423,7 @@ const Onboarding = () => {
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-3">
                     <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        item.done ? "bg-emerald-600" : "bg-[#2d2b40]"
-                      }`}>
+                      className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${item.done ? "bg-emerald-600" : "bg-[#2d2b40]"}`}>
                       {item.done ?
                         <svg
                           width="10"
@@ -460,18 +454,42 @@ const Onboarding = () => {
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 mt-5">
-            {canSkip && !isDone && (
+          <div className="flex gap-2 mt-5">
+            {/* Back button */}
+            {canGoBack && (
+              <button
+                onClick={back}
+                className="w-11 h-11 flex items-center justify-center border border-[#2d2b40] text-[#6b6880] hover:text-[#e8e6f0] hover:border-[#4a4760] rounded-xl transition-all cursor-pointer bg-transparent flex-shrink-0"
+                aria-label="Go back">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+              </button>
+            )}
+
+            {/* Skip button — only on content steps, not done */}
+            {!isDone && (
               <button
                 onClick={skip}
-                className="px-5 py-3 border border-[#2d2b40] text-[#6b6880] hover:text-[#9b8ec4] hover:border-[#4a4760] text-[13px] rounded-xl transition-all cursor-pointer bg-transparent">
+                className="px-5 h-11 border border-[#2d2b40] text-[#6b6880] hover:text-[#9b8ec4] hover:border-[#4a4760] text-[13px] rounded-xl transition-all cursor-pointer bg-transparent flex-shrink-0">
                 Skip
               </button>
             )}
+
+            {/* Primary action */}
             <button
               onClick={isDone ? handleComplete : next}
               disabled={isLoading}
-              className="flex-1 py-3 bg-violet-700 hover:bg-violet-600 disabled:opacity-50 text-white font-medium text-[14px] rounded-xl transition-all cursor-pointer border-none">
+              className="flex-1 h-11 bg-violet-700 hover:bg-violet-600 disabled:opacity-50 text-white font-medium text-[14px] rounded-xl transition-all cursor-pointer border-none">
               {isLoading ?
                 "Saving..."
               : isDone ?
