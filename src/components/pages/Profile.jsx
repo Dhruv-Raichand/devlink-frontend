@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import ProfileEdit from "./ProfileEdit";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import SlideInHint from "../ui/SlideInHint";
 
 const GitHubIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -69,6 +70,14 @@ const Profile = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-8 pb-20">
+      <SlideInHint
+        id="profile_no_photo"
+        condition={!user?.photoUrl}
+        icon="📸"
+        title="Add a profile photo"
+        body="Profiles with photos get significantly more connection requests."
+        action={{ label: "Add photo", onClick: () => setIsEditing(true) }}
+      />
       {/* Card */}
       <div className="bg-[#13121c] border border-[#1e1d28] rounded-2xl overflow-hidden">
         {/* Cover */}
