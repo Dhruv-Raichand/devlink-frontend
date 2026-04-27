@@ -7,12 +7,16 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 import { Link } from "react-router-dom";
 import InlineBanner from "../ui/Inlinebanner";
+import { useSearchParams } from "react-router-dom";
 
 const Requests = () => {
   const dispatch = useDispatch();
   const requests = useSelector((state) => state.request);
 
-  const [tab, setTab] = useState("received");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") || "received";
+  const setTab = (id) => setSearchParams({ tab: id });
+
   const [sentRequests, setSentRequests] = useState([]);
   const [loadingReceived, setLoadingReceived] = useState(false);
   const [loadingSent, setLoadingSent] = useState(false);
