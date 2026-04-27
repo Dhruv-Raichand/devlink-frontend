@@ -229,7 +229,7 @@ export default function Landing() {
             Join thousands of developers already connecting on DevLink.
           </p>
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/login", { state: { mode: "signup" } })}
             className="relative px-9 py-3.5 text-[15px] font-medium text-white bg-violet-700 rounded-lg hover:bg-violet-600 hover:-translate-y-px transition-all cursor-pointer">
             Create free account
           </button>
