@@ -1,34 +1,10 @@
 import { useState, useRef } from "react";
 import UserCard from "../ui/UserCard";
 import api from "../../utils/api";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
-
-const PREDEFINED_SKILLS = [
-  "React",
-  "Node.js",
-  "TypeScript",
-  "JavaScript",
-  "Python",
-  "Go",
-  "Rust",
-  "Java",
-  "C++",
-  "Swift",
-  "Kotlin",
-  "Docker",
-  "Kubernetes",
-  "AWS",
-  "GraphQL",
-  "MongoDB",
-  "PostgreSQL",
-  "Next.js",
-  "Vue",
-  "Flutter",
-  "DevOps",
-];
 
 const GENDER_OPTIONS = [
   { value: "male", label: "Male" },
@@ -55,6 +31,8 @@ const ProfileEdit = ({ user, onSaved }) => {
   const [githubUsername, setGithubUsername] = useState(
     user?.githubUsername || "",
   );
+
+  const PREDEFINED_SKILLS = useSelector((state) => state.skills.data) || [];
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

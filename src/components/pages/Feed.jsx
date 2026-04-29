@@ -11,22 +11,10 @@ import { useNavigate } from "react-router-dom";
 
 const LIMIT = 5;
 
-const FILTER_SKILLS = [
-  "React",
-  "Node.js",
-  "TypeScript",
-  "Python",
-  "Go",
-  "Rust",
-  "Java",
-  "Docker",
-  "AWS",
-  "Flutter",
-];
-
 const Feed = () => {
   const feed = useSelector((state) => state.feed ?? []);
   const user = useSelector((state) => state.user);
+  const FILTER_SKILLS = useSelector((state) => state.skills.data) || [];
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
