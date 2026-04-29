@@ -28,3 +28,53 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #2d2b40 #0a0a0f;
 }
+
+/* Base */
+.Toastify__toast {
+  background: #0f0f0f;
+  color: #e5e7eb;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* SUCCESS */
+.Toastify__toast--success {
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.Toastify__toast--success .Toastify__toast-icon svg {
+  fill: #a855f7 !important;
+}
+
+.Toastify__progress-bar--success {
+  background: #a855f7;
+}
+
+/* ERROR (keep red for clarity) */
+.Toastify__toast--error {
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.Toastify__toast--error .Toastify__toast-icon svg {
+  fill: #f87171 !important;
+}
+
+.Toastify__progress-bar--error {
+  background: #f87171;
+}
+
+/* LOADING */
+.Toastify__spinner {
+  border-top-color: #a855f7 !important;
+}
+
+/* Ensure close button is visible */
+.Toastify__close-button {
+  color: #9ca3af; /* light gray */
+  opacity: 1;
+}
+
+/* Hover effect */
+.Toastify__close-button:hover {
+  color: #ffffff;
+}
