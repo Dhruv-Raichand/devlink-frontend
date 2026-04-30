@@ -3,8 +3,9 @@ import api from "../../utils/api";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../../store/userSlice";
 import { useNavigate, useLocation } from "react-router-dom";
-import { notifyError, notifySuccess } from "../../utils/toast";
+import { baseConfig, getErrorData } from "../../utils/toast";
 import NavBar from "../layout/NavBar";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -14,6 +15,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [retryAfter, setRetryAfter] = useState(null);
 
   const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(
@@ -25,6 +27,7 @@ const Login = () => {
   const user = useSelector((store) => store.user);
 
   const handleSignUp = async () => {
+    const toastId = toast.loading("Creating account...", baseConfig);
     setIsLoading(true);
     try {
       const res = await api.post("/auth/signup", {
@@ -33,26 +36,53 @@ const Login = () => {
         emailId,
         password,
       });
-      notifySuccess("Registration Successful!");
+
+      toast.update(toastId, {
+        render: "Account created 🎉",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
       dispatch(addUser(res?.data?.data));
     } catch (err) {
-      notifyError(err?.response?.data?.message || "Registration failed");
-      setError(err?.response?.data?.message || "Registration failed");
+      const { message, retryAfter: retryTime } = getErrorData(err);
+      setRetryAfter(retryTime);
+
+      toast.update(toastId, {
+        render: message,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLogin = async () => {
+    const toastId = toast.loading("Logging in...", baseConfig);
+
     setIsLoading(true);
     try {
       const res = await api.post("/auth/login", { emailId, password });
-      notifySuccess("Login Successful!");
+      toast.update(toastId, {
+        render: "Welcome back 👋",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
       dispatch(addUser(res?.data?.data));
       return navigate("/app");
     } catch (err) {
-      notifyError(err?.response?.data?.message || "Login failed");
-      setError(err?.response?.data?.message || "Login failed");
+      const { message, retryAfter: retryTime } = getErrorData(err);
+      setRetryAfter(retryTime);
+
+      toast.update(toastId, {
+        render: message,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +102,22 @@ const Login = () => {
       navigate(onboardingDone ? "/app" : "/app/onboarding");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (!retryAfter) return;
+
+    const interval = setInterval(() => {
+      setRetryAfter((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [retryAfter]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
@@ -238,11 +284,17 @@ const Login = () => {
               </div>
             )}
 
+            {retryAfter && (
+              <p className="text-yellow-400 text-sm mt-2">
+                Try again in {retryAfter} minute(s)
+              </p>
+            )}
+
             {/* Submit */}
             <button
               type="submit"
               onClick={isLoginMode ? handleLogin : handleSignUp}
-              disabled={isLoading || !isFormValid}
+              disabled={isLoading || !isFormValid || retryAfter}
               className="w-full bg-violet-700 hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg text-[14px] transition-all hover:-translate-y-px cursor-pointer mt-1 border-none">
               {isLoading ?
                 <span className="flex items-center justify-center gap-2">
