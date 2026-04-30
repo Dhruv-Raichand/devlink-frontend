@@ -65,6 +65,7 @@ const NavBar = () => {
     { to: "/app/connections", label: "Connections" },
     { to: "/app/requests", label: "Requests" },
     { to: "/app/messages", label: "Messages" },
+    { to: "/app/premium", label: "Premium" },
   ];
 
   return (
@@ -188,7 +189,7 @@ const NavBar = () => {
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                           <circle cx="12" cy="7" r="4" />
                         </svg>
-                        Edit profile
+                        Profile
                       </Link>
                     </div>
 
@@ -291,7 +292,7 @@ const NavBar = () => {
             <Link
               to="/app/profile"
               className="px-3 py-2.5 rounded-lg text-[13px] font-medium text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c] transition-colors no-underline">
-              Edit profile
+              Profile
             </Link>
           </nav>
 
