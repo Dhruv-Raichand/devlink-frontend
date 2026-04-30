@@ -18,6 +18,7 @@ import AuthLoader from "./components/layout/AuthLoader";
 import PublicRoute from "./components/layout/PublicRoutes";
 import ProtectedRoute from "./components/layout/ProtectedRoutes";
 import Layout from "./components/layout/Layout";
+import Premium from "./components/pages/Premium";
 
 function App() {
   return (
@@ -78,6 +79,7 @@ function App() {
               <Route path="messages" element={<ChatInbox />} />
               <Route path="messages/:targetUserId" element={<Chat />} />
               <Route path="profile/:userId" element={<ViewProfile />} />
+              <Route path="premium" element={<Premium />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
