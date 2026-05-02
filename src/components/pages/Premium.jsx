@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import api from "../../utils/api";
+import { useSelector } from "react-redux";
+// import { useNavigate } from "react-router-dom";
 
 const PLANS = [
   {
-    id: "free",
+    id: "FREE",
     name: "Free",
     price: { monthly: 0, yearly: 0 },
     description: "Everything you need to get started",
@@ -24,9 +26,9 @@ const PLANS = [
     ],
   },
   {
-    id: "pro",
+    id: "PRO",
     name: "Pro",
-    price: { monthly: 9, yearly: 7 },
+    price: { monthly: 499, yearly: 399 },
     description: "For developers serious about connecting",
     cta: "Get Pro",
     ctaDisabled: false,
@@ -46,9 +48,9 @@ const PLANS = [
     ],
   },
   {
-    id: "elite",
+    id: "ELITE",
     name: "Elite",
-    price: { monthly: 19, yearly: 15 },
+    price: { monthly: 999, yearly: 799 },
     description: "Maximum visibility, maximum connections",
     cta: "Get Elite",
     ctaDisabled: false,
@@ -162,7 +164,41 @@ const CheckIcon = ({ filled }) =>
 
 function Premium() {
   const [billing, setBilling] = useState("monthly");
-  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+
+  // TODO:
+  // - Add payment verification endpoint (/payment/verify)
+  // - Handle Razorpay success + failure
+  // - Add loading state to prevent multiple clicks
+  // - Support yearly billing in backend
+
+  const handleBuyClick = async (plan) => {
+    const order = await api.post("/payment/create", {
+      membershipType: plan.id,
+    });
+
+    const { orderId, amount, currency } = order.data.data;
+    // Open Razorpay Checkout
+    const options = {
+      key: order.data.keyId,
+      amount: amount,
+      currency: currency,
+      name: "DevLink",
+      description: "Test Transaction",
+      order_id: orderId,
+      prefill: {
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#8E51FF",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 pt-10 pb-24">
@@ -252,7 +288,7 @@ function Premium() {
                     </span>
                   : <>
                       <span className="font-['Outfit'] font-extrabold text-[36px] text-white tracking-tight">
-                        ${plan.price[billing]}
+                        ₹{plan.price[billing]}
                       </span>
                       <span className="text-[13px] text-[#4a4760]">/mo</span>
                     </>
@@ -260,7 +296,7 @@ function Premium() {
                 </div>
                 {billing === "yearly" && plan.price.yearly > 0 && (
                   <p className="text-[11px] text-emerald-400 mt-1">
-                    Billed ${plan.price.yearly * 12}/year
+                    Billed ₹{plan.price.yearly * 12}/year
                   </p>
                 )}
               </div>
@@ -268,7 +304,7 @@ function Premium() {
               {/* CTA */}
               <button
                 disabled={plan.ctaDisabled}
-                onClick={() => !plan.ctaDisabled && navigate("/app")}
+                onClick={() => !plan.ctaDisabled && handleBuyClick(plan)}
                 className={`w-full py-2.5 rounded-xl text-[13px] font-medium transition-all mb-6 ${
                   plan.ctaDisabled ?
                     "bg-[#1a1928] border border-[#2d2b40] text-[#4a4760] cursor-default"
@@ -348,7 +384,7 @@ function Premium() {
             },
             {
               q: "What payment methods do you accept?",
-              a: "We accept all major credit and debit cards via Stripe. Your payment info is never stored on our servers.",
+              a: "We accept all major credit and debit cards via Razorpay. Your payment info is never stored on our servers.",
             },
             {
               q: "Can I switch plans?",
@@ -370,7 +406,7 @@ function Premium() {
           Join developers already using DevLink Pro to build faster, together.
         </p>
         <button
-          onClick={() => navigate("/app")}
+          onClick={() => handleBuyClick(PLANS[1])}
           className="relative px-8 py-3 bg-violet-700 hover:bg-violet-600 text-white text-[14px] font-medium rounded-xl transition-all cursor-pointer border-none">
           Start with Pro →
         </button>
