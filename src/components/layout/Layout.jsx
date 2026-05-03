@@ -5,10 +5,31 @@ import { useDispatch, useSelector } from "react-redux";
 import api from "../../utils/api";
 import { setSkills } from "../../store/skillsSlice";
 import { useEffect } from "react";
+import { createSocketConnection } from "../../utils/socket";
+import { addNotification } from "../../store/notificationSlice";
 
 const Layout = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const { loaded } = useSelector((state) => state.skills);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const socket = createSocketConnection();
+
+    socket.emit("register", user._id);
+
+    const handler = (data) => {
+      dispatch(addNotification(data));
+    };
+
+    socket.on("newNotification", handler);
+
+    return () => {
+      socket.off("newNotification", handler);
+    };
+  }, [user?._id]);
 
   useEffect(() => {
     if (!loaded) {
