@@ -28,7 +28,7 @@ const PLANS = [
   {
     id: "PRO",
     name: "Pro",
-    price: { monthly: 499, yearly: 399 },
+    price: { monthly: 499, yearly: 3999 },
     description: "For developers serious about connecting",
     cta: "Get Pro",
     ctaDisabled: false,
@@ -50,7 +50,7 @@ const PLANS = [
   {
     id: "ELITE",
     name: "Elite",
-    price: { monthly: 999, yearly: 799 },
+    price: { monthly: 999, yearly: 7999 },
     description: "Maximum visibility, maximum connections",
     cta: "Get Elite",
     ctaDisabled: false,
@@ -164,6 +164,7 @@ const CheckIcon = ({ filled }) =>
 
 function Premium() {
   const [billing, setBilling] = useState("monthly");
+  const [loading, setLoading] = useState(false);
   const user = useSelector((state) => state.user);
 
   // TODO:
@@ -173,31 +174,42 @@ function Premium() {
   // - Support yearly billing in backend
 
   const handleBuyClick = async (plan) => {
-    const order = await api.post("/payment/create", {
-      membershipType: plan.id,
-    });
+    if (loading) return;
+    setLoading(true);
 
-    const { orderId, amount, currency } = order.data.data;
-    // Open Razorpay Checkout
-    const options = {
-      key: order.data.keyId,
-      amount: amount,
-      currency: currency,
-      name: "DevLink",
-      description: "Test Transaction",
-      order_id: orderId,
-      prefill: {
-        name: `${user.firstName} ${user.lastName}`,
-        email: user.email,
-        contact: "9999999999",
-      },
-      theme: {
-        color: "#8E51FF",
-      },
-    };
+    try {
+      const order = await api.post("/payment/create", {
+        membershipType: plan.id,
+        billingCycle: billing.toUpperCase(),
+      });
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+      const { orderId, amount, currency } = order.data.data;
+      // Open Razorpay Checkout
+      const options = {
+        key: order.data.keyId,
+        amount: amount,
+        currency: currency,
+        name: "DevLink",
+        description: "Test Transaction",
+        order_id: orderId,
+        prefill: {
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#8E51FF",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Payment initiation failed:", err);
+      alert("Failed to initiate payment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -290,13 +302,15 @@ function Premium() {
                       <span className="font-['Outfit'] font-extrabold text-[36px] text-white tracking-tight">
                         ₹{plan.price[billing]}
                       </span>
-                      <span className="text-[13px] text-[#4a4760]">/mo</span>
+                      <span className="text-[13px] text-[#4a4760]">
+                        {billing === "monthly" ? "/mo" : "/year"}
+                      </span>
                     </>
                   }
                 </div>
                 {billing === "yearly" && plan.price.yearly > 0 && (
                   <p className="text-[11px] text-emerald-400 mt-1">
-                    Billed ₹{plan.price.yearly * 12}/year
+                    ₹{plan.price.yearly}/year
                   </p>
                 )}
               </div>
