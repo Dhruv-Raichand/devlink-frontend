@@ -180,8 +180,8 @@ function Premium() {
   };
 
   const pollForUpgrade = async (orderId, planName) => {
-    const MAX_ATTEMPTS = 10;
-    const INTERVAL_MS = 1500;
+    const MAX_ATTEMPTS = 20;
+    const INTERVAL_MS = 2000;
 
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
       await new Promise((r) => setTimeout(r, INTERVAL_MS));
