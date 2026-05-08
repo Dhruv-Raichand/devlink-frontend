@@ -119,22 +119,27 @@ const Requests = () => {
     </button>
   );
 
-  const AvatarLink = ({ to, state, photoUrl, firstName, lastName }) => (
-    <Link to={to} state={state} className="flex-shrink-0">
-      <div className="w-12 h-12 rounded-full overflow-hidden border border-[#2d2b40] hover:border-violet-600 transition-colors">
-        <img
-          src={photoUrl}
-          alt={firstName}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              firstName + " " + lastName,
-            )}&background=6d28d9&color=fff`;
-          }}
-        />
-      </div>
-    </Link>
-  );
+  const AvatarLink = ({ to, state, photoUrl, firstName, lastName }) => {
+    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      `${firstName} ${lastName}`,
+    )}&background=6d28d9&color=fff`;
+
+    return (
+      <Link to={to} state={state} className="flex-shrink-0">
+        <div className="w-12 h-12 rounded-full overflow-hidden border border-[#2d2b40] hover:border-violet-600 transition-colors">
+          <img
+            src={photoUrl || fallbackAvatar}
+            alt={firstName}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackAvatar;
+            }}
+          />
+        </div>
+      </Link>
+    );
+  };
 
   const UserMeta = ({ to, state, firstName, lastName, age, gender, about }) => (
     <div className="flex-1 min-w-0">
