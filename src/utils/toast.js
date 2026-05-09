@@ -37,3 +37,7 @@ export const notifySuccess = (msg) => {
 export const notifyError = (msg) => {
   toast.error(msg, baseConfig);
 };
+
+export const notify = (msg) => {
+  toast(msg, baseConfig);
+};

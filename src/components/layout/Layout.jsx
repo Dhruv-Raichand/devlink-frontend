@@ -7,6 +7,8 @@ import { setSkills } from "../../store/skillsSlice";
 import { useEffect } from "react";
 import { createSocketConnection } from "../../utils/socket";
 import { addNotification } from "../../store/notificationSlice";
+import { notify } from "../../utils/toast";
+import { setOnline, setOffline, setOnlineList } from "../../store/onlineSlice";
 
 const Layout = () => {
   const dispatch = useDispatch();
@@ -20,16 +22,31 @@ const Layout = () => {
 
     socket.emit("register", user._id);
 
-    const handler = (data) => {
-      dispatch(addNotification(data));
-    };
+    socket.on("onlineList", (list) => dispatch(setOnlineList(list)));
 
-    socket.on("newNotification", handler);
+    socket.on("userOnline", (userId) => dispatch(setOnline(userId)));
+    socket.on("userOffline", (userId) => dispatch(setOffline(userId)));
+
+    socket.on("newNotification", (notification) => {
+      dispatch(addNotification(notification));
+
+      if (notification.type === "message") {
+        notify(`💬 ${notification.from}: ${notification.text}`);
+      } else if (notification.type === "request") {
+        notify(`🔔 ${notification.from} sent you a connection request`);
+      } else if (notification.type === "request_accepted") {
+        console.log("Request accepted notification received:", notification);
+        notify(`🎉 ${notification.from} accepted your connection request`);
+      }
+    });
 
     return () => {
-      socket.off("newNotification", handler);
+      socket.off("newNotification");
+      socket.off("userOnline");
+      socket.off("userOffline");
+      socket.off("onlineList");
     };
-  }, [user?._id]);
+  }, [user]);
 
   useEffect(() => {
     if (!loaded) {

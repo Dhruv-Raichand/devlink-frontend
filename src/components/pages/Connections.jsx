@@ -11,6 +11,7 @@ import InlineBanner from "../ui/Inlinebanner";
 const Connections = () => {
   const dispatch = useDispatch();
   const connections = useSelector((state) => state.connection);
+  const onlineUsers = useSelector((state) => state.online ?? []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [removing, setRemoving] = useState(new Set());
@@ -117,14 +118,15 @@ const Connections = () => {
           const { _id, firstName, lastName, photoUrl, about, skills } = c;
           const isRemoving = removing.has(_id);
           const isConfirming = confirmId === _id;
+          const isOnline = onlineUsers.includes(_id);
 
           return (
             <div
               key={_id}
-              className="bg-[#13121c] border border-[#1e1d28] rounded-xl overflow-hidden hover:border-[#3730a3] transition-all duration-200 flex flex-col">
+              className="bg-[#13121c] border border-[#1e1d28] rounded-xl hover:border-[#3730a3] transition-all duration-200 flex flex-col">
               {/* Photo */}
               <Link to={`/app/profile/${_id}`} state={{ targetUser: c }}>
-                <div className="h-44 bg-[#1a1928] overflow-hidden">
+                <div className="bg-[#13121c] border border-[#1e1d28] rounded-xl h-44 overflow-hidden">
                   <img
                     src={photoUrl}
                     alt={firstName}
@@ -151,9 +153,11 @@ const Connections = () => {
                       </p>
                     )}
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-900/60 text-emerald-400 flex-shrink-0 ml-2">
-                    Connected
-                  </span>
+                  {isOnline && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-900/60 text-emerald-400 flex-shrink-0 ml-2">
+                      Active
+                    </span>
+                  )}
                 </div>
 
                 {/* Skills */}
@@ -184,46 +188,58 @@ const Connections = () => {
                   </Link>
 
                   {/* View profile */}
-                  <Link
-                    to={`/app/profile/${_id}`}
-                    state={{ targetUser: c }}
-                    className="w-8 h-8 flex items-center justify-center border border-[#2d2b40] rounded-lg text-[#6b6880] hover:text-[#e8e6f0] hover:border-[#4a4760] transition-all">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
-                  </Link>
+                  <div className="relative group">
+                    <Link
+                      to={`/app/profile/${_id}`}
+                      state={{ targetUser: c }}
+                      className="w-8 h-8 flex items-center justify-center border border-[#2d2b40] rounded-lg text-[#6b6880] hover:text-[#e8e6f0] hover:border-[#4a4760] transition-all">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </Link>
+
+                    <div className="absolute left-1/2 top-[-36px] -translate-x-1/2 opacity-0 group-hover:opacity-100 transition pointer-events-none bg-[#1e1d2b] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                      View profile
+                    </div>
+                  </div>
 
                   {/* Remove — confirm inline */}
+
                   {
                     !isConfirming ?
-                      <button
-                        onClick={() => setConfirmId(_id)}
-                        className="w-8 h-8 flex items-center justify-center border border-[#2d2b40] rounded-lg text-[#6b6880] hover:text-red-400 hover:border-red-900/60 hover:bg-red-950/20 transition-all cursor-pointer bg-transparent"
-                        aria-label="Remove connection">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round">
-                          <path d="M16 11c0 2.21-1.79 4-4 4s-4-1.79-4-4" />
-                          <path d="M21 21l-4.35-4.35" />
-                          <path d="M17 11V3H7v8" />
-                          <path d="M3 21h18" />
-                        </svg>
-                      </button>
+                      <div className="relative group">
+                        <button
+                          onClick={() => setConfirmId(_id)}
+                          className="w-8 h-8 flex items-center justify-center border border-[#2d2b40] rounded-lg text-[#6b6880] hover:text-red-400 hover:border-red-900/60 hover:bg-red-950/20 transition-all cursor-pointer bg-transparent"
+                          aria-label="Remove connection">
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round">
+                            <path d="M16 11c0 2.21-1.79 4-4 4s-4-1.79-4-4" />
+                            <path d="M21 21l-4.35-4.35" />
+                            <path d="M17 11V3H7v8" />
+                            <path d="M3 21h18" />
+                          </svg>
+                        </button>
+                        <div className="absolute left-1/2 top-[-36px] -translate-x-1/2 opacity-0 group-hover:opacity-100 transition pointer-events-none bg-[#1e1d2b] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                          Remove connection
+                        </div>
+                      </div>
                       // Confirm row replaces the button row
                     : <div className="flex gap-1.5 ml-auto">
                         <button

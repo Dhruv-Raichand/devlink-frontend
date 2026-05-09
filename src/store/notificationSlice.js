@@ -8,6 +8,9 @@ const notificationSlice = createSlice({
       state.unshift(action.payload);
     },
     clearNotifications: () => [],
+    clearByType: (state, action) => {
+      return state.filter((n) => n.type !== action.payload);
+    },
   },
 });
 
