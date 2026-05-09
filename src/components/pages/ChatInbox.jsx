@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
+import { useSelector } from "react-redux";
 
 const formatTime = (dateStr) => {
   if (!dateStr) return "";
@@ -25,6 +26,7 @@ const ChatInbox = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const onlineUsers = useSelector((state) => state.online); // to trigger re-render on online status change
 
   useEffect(() => {
     api
@@ -121,63 +123,75 @@ const ChatInbox = () => {
           <p className="text-center text-[13px] text-[#4a4760] py-10">
             No results for "{search}"
           </p>
-        : filtered.map((c) => (
-            <Link
-              key={c.userId}
-              to={`/app/messages/${c.userId}`}
-              state={{
-                targetUser: {
-                  _id: c.userId,
-                  firstName: c.firstName,
-                  lastName: c.lastName,
-                  photoUrl: c.photoUrl,
-                },
-              }}
-              className="flex items-center gap-3 px-3 py-3.5 rounded-xl hover:bg-[#13121c] border border-transparent hover:border-[#1e1d28] transition-all no-underline group">
-              {/* Avatar */}
-              <div className="w-11 h-11 rounded-full overflow-hidden border border-[#2d2b40] flex-shrink-0">
-                <img
-                  src={c.photoUrl}
-                  alt={c.firstName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      c.firstName + " " + c.lastName,
-                    )}&background=6d28d9&color=fff`;
-                  }}
-                />
-              </div>
+        : filtered.map((c) => {
+            const isOnline = onlineUsers.includes(c.userId);
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline justify-between gap-2 mb-0.5">
-                  <p className="text-[14px] font-medium text-[#e8e6f0] group-hover:text-white transition-colors truncate">
-                    {c.firstName} {c.lastName}
-                  </p>
-                  <span className="text-[11px] text-[#4a4760] flex-shrink-0">
-                    {formatTime(c.lastMessageAt)}
-                  </span>
+            return (
+              <Link
+                key={c.userId}
+                to={`/app/messages/${c.userId}`}
+                state={{
+                  targetUser: {
+                    _id: c.userId,
+                    firstName: c.firstName,
+                    lastName: c.lastName,
+                    photoUrl: c.photoUrl,
+                  },
+                }}
+                className="flex items-center gap-3 px-3 py-3.5 rounded-lg hover:bg-[#13121c] border border-transparent hover:border-[#1e1d28] transition-all no-underline group">
+                {/* Avatar */}
+                <div className="relative w-11 h-11 rounded-full border border-[#2d2b40] flex-shrink-0">
+                  <div className="w-full h-full rounded-full overflow-hidden border border-[#2d2b40]">
+                    <img
+                      src={c.photoUrl}
+                      alt={c.firstName}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          c.firstName + " " + c.lastName,
+                        )}&background=6d28d9&color=fff`;
+                      }}
+                    />
+                  </div>
+                  {isOnline && (
+                    <span
+                      className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 
+      rounded-full border-2 border-[#0a0a0f] z-10"
+                    />
+                  )}
                 </div>
-                <p className="text-[12px] text-[#4a4760] truncate">
-                  {c.lastMessage || "No messages yet"}
-                </p>
-              </div>
 
-              {/* Arrow */}
-              <svg
-                className="text-[#2d2b40] group-hover:text-[#6b6880] transition-colors flex-shrink-0 ml-1"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </Link>
-          ))
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline justify-between gap-2 mb-0.5">
+                    <p className="text-[14px] font-medium text-[#e8e6f0] group-hover:text-white transition-colors truncate">
+                      {c.firstName} {c.lastName}
+                    </p>
+                    <span className="text-[11px] text-[#4a4760] flex-shrink-0">
+                      {formatTime(c.lastMessageAt)}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-[#4a4760] truncate">
+                    {c.lastMessage || "No messages yet"}
+                  </p>
+                </div>
+
+                {/* Arrow */}
+                <svg
+                  className="text-[#2d2b40] group-hover:text-[#6b6880] transition-colors flex-shrink-0 ml-1"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </Link>
+            );
+          })
         }
       </div>
     </div>

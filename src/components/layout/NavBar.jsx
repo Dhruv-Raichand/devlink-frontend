@@ -4,12 +4,26 @@ import api from "../../utils/api";
 import { removeUser } from "../../store/userSlice";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import { useState, useEffect, useRef } from "react";
+import { useMemo } from "react";
 
 const NavBar = () => {
   const user = useSelector((state) => state.user);
+  const notifications = useSelector((state) => state.notifications || []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { messageCount, requestCount } = useMemo(() => {
+    let message = 0;
+    let request = 0;
+
+    notifications.forEach((n) => {
+      if (n.type === "message") message++;
+      if (n.type === "request") request++;
+    });
+
+    return { messageCount: message, requestCount: request };
+  }, [notifications]);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -63,8 +77,8 @@ const NavBar = () => {
   const NAV_LINKS = [
     { to: "/app", label: "Home" },
     { to: "/app/connections", label: "Connections" },
-    { to: "/app/requests", label: "Requests" },
-    { to: "/app/messages", label: "Messages" },
+    { to: "/app/requests", label: "Requests", count: requestCount },
+    { to: "/app/messages", label: "Messages", count: messageCount },
     { to: "/app/premium", label: "Premium" },
   ];
 
@@ -124,17 +138,24 @@ const NavBar = () => {
         {user && (
           <>
             {/* Desktop links */}
-            <ul className="hidden md:flex items-center gap-1 list-none m-0 p-0">
+            <ul className="hidden md:flex items-center gap-2 list-none m-0 p-0">
               {NAV_LINKS.map((link) => (
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
+                    className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all no-underline ${
                       isActive(link.to) ?
                         "text-white bg-[#1a1928]"
                       : "text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c]"
                     }`}>
                     {link.label}
+                    {link.to === location.pathname ? null : (
+                      link.count > 0 && (
+                        <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                          {link.count > 99 ? "99+" : link.count}
+                        </span>
+                      )
+                    )}
                   </Link>
                 </li>
               ))}
@@ -281,12 +302,19 @@ const NavBar = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors no-underline ${
+                className={`relative px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors no-underline ${
                   isActive(link.to) ?
                     "text-white bg-[#1a1928]"
                   : "text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c]"
                 }`}>
                 {link.label}
+                {link.to === location.pathname ? null : (
+                  link.count > 0 && (
+                    <span className="absolute right-3 top-2  bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                      {link.count > 99 ? "99+" : link.count}
+                    </span>
+                  )
+                )}
               </Link>
             ))}
             <Link

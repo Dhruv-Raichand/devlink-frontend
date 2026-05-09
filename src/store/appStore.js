@@ -4,6 +4,8 @@ import feedReducer from "./feedSlice";
 import connectionReducer from "./connectionSlice";
 import requestReducer from "./requestSlice";
 import skillsReducer from "./skillsSlice";
+import notificationReducer from "./notificationSlice";
+import onlineReducer from "./onlineSlice";
 
 export default configureStore({
   reducer: {
@@ -12,5 +14,7 @@ export default configureStore({
     connection: connectionReducer,
     request: requestReducer,
     skills: skillsReducer,
+    notifications: notificationReducer,
+    online: onlineReducer,
   },
 });

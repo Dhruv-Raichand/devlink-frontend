@@ -13,6 +13,7 @@ const Chat = () => {
   const user = useSelector((store) => store.user);
   const userId = user?._id;
   const messagesEndRef = useRef(null);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,28 +41,33 @@ const Chat = () => {
 
   useEffect(() => {
     if (!userId) return;
+
     const socket = createSocketConnection();
+    socketRef.current = socket;
+
     socket.emit("joinChat", {
       firstName: user?.firstName,
       userId,
       targetUserId,
     });
-    socket.on(
-      "messageReceived",
-      ({ firstName, lastName, photoUrl, text, createdAt }) => {
-        setMessages((prev) => [
-          ...prev,
-          { firstName, lastName, photoUrl, text, createdAt },
-        ]);
-      },
-    );
-    return () => socket.disconnect();
+
+    const handler = ({ firstName, lastName, photoUrl, text, createdAt }) => {
+      setMessages((prev) => [
+        ...prev,
+        { firstName, lastName, photoUrl, text, createdAt },
+      ]);
+    };
+
+    socket.on("messageReceived", handler);
+
+    return () => {
+      socket.off("messageReceived", handler);
+    };
   }, [userId, targetUserId]);
 
   const sendMessage = () => {
     if (!newMessage.trim()) return;
-    const socket = createSocketConnection();
-    socket.emit("sendMessage", {
+    socketRef.current.emit("sendMessage", {
       firstName: user?.firstName,
       lastName: user?.lastName,
       photoUrl: user?.photoUrl,
