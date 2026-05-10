@@ -19,6 +19,7 @@ import PublicRoute from "./components/layout/PublicRoutes";
 import ProtectedRoute from "./components/layout/ProtectedRoutes";
 import Layout from "./components/layout/Layout";
 import Premium from "./components/pages/Premium";
+import VerifyEmail from "./components/pages/VerifyEmail";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
                 </PublicRoute>
               }
             />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
             {/* Onboarding — protected but outside Layout (no navbar) */}
             <Route

@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../../utils/api";
 import { addUser } from "../../store/userSlice";
+import { useSearchParams } from "react-router-dom";
+import { notify } from "../../utils/toast";
 
 const AuthLoader = ({ children }) => {
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
   const user = useSelector((state) => state.user);
   const [checking, setChecking] = useState(!user);
   const [serverDown, setServerDown] = useState(false);
@@ -24,6 +27,13 @@ const AuthLoader = ({ children }) => {
         }
       })
       .finally(() => setChecking(false));
+  }, []);
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "true") {
+      notify("Email verified! Welcome to DevLink 🎉");
+      setSearchParams({});
+    }
   }, []);
 
   if (checking) {
