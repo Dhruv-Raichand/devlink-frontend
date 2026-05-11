@@ -137,7 +137,7 @@ export default function Landing() {
 
           <p className="text-base text-[#7a7590] max-w-md mx-auto mb-10 leading-relaxed [animation:fadeUp_0.6s_ease_0.35s_both]">
             Swipe through developers, match by tech stack, build something great
-            together. The Tinder for engineers.
+            together.
           </p>
 
           <div className="flex gap-3 justify-center flex-wrap [animation:fadeUp_0.6s_ease_0.5s_both]">
