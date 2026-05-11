@@ -4,7 +4,6 @@ import api from "../../utils/api";
 import { addUser } from "../../store/userSlice";
 import { notifyError } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
-import useHints from "../../hooks/useHints";
 
 const PREDEFINED_SKILLS = [
   "React",
@@ -73,7 +72,6 @@ const Onboarding = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { completeOnboarding } = useHints();
 
   const [step, setStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,9 +119,14 @@ const Onboarding = () => {
     }
   };
 
-  const handleComplete = () => {
-    completeOnboarding();
-    navigate("/app");
+  const handleComplete = async () => {
+    try {
+      const res = await api.post("/profile/onboarding/complete");
+      dispatch(addUser(res.data.data));
+      navigate("/app");
+    } catch {
+      navigate("/app");
+    }
   };
 
   const next = async () => {
@@ -148,7 +151,10 @@ const Onboarding = () => {
   };
 
   const back = () => setStep((s) => Math.max(s - 1, 0));
-  const skip = () => setStep((s) => Math.min(s + 1, 3));
+  const skip = async () => {
+    const nextStep = Math.min(step + 1, 3);
+    setStep(nextStep);
+  };
 
   const isDone = step === 3;
   const isLastContent = step === 2;

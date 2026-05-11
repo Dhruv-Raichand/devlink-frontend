@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { baseConfig, getErrorData } from "../../utils/toast";
 import NavBar from "../layout/NavBar";
 import { toast } from "react-toastify";
+import { isOnboardingComplete } from "../../hooks/useOnboarding";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -95,11 +96,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      const onboardingDone =
-        localStorage.getItem("onboarding_complete") === "true";
-      console.log("User logged in, onboarding done:", onboardingDone);
-
-      navigate(onboardingDone ? "/app" : "/app/onboarding");
+      navigate(isOnboardingComplete(user) ? "/app" : "/app/onboarding");
     }
   }, [user, navigate]);
 
