@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import api from "../../utils/api";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
+import MembershipBadge from "../ui/MembershipBadge";
 
 const GitHubIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -123,9 +124,12 @@ const ViewProfile = () => {
         <div className="pt-14 px-6 pb-6">
           {/* Name + meta */}
           <div className="mb-5">
-            <h1 className="font-['Outfit'] font-extrabold text-[24px] text-white tracking-tight leading-tight">
-              {user.firstName} {user.lastName}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-['Outfit'] font-extrabold text-[24px] text-white tracking-tight leading-tight">
+                {user.firstName} {user.lastName}
+              </h1>
+              <MembershipBadge membershipType={user.membershipType} />
+            </div>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               {user.age && (
                 <span className="text-[12px] text-[#6b6880]">
