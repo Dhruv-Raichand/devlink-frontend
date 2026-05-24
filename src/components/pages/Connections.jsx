@@ -7,6 +7,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 import { notifySuccess, notifyError } from "../../utils/toast";
 import InlineBanner from "../ui/Inlinebanner";
+import MembershipBadge from "../ui/MembershipBadge";
 
 const Connections = () => {
   const dispatch = useDispatch();
@@ -115,7 +116,15 @@ const Connections = () => {
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {connections.map((c) => {
-          const { _id, firstName, lastName, photoUrl, about, skills } = c;
+          const {
+            _id,
+            firstName,
+            lastName,
+            photoUrl,
+            about,
+            skills,
+            membershipType,
+          } = c;
           const isRemoving = removing.has(_id);
           const isConfirming = confirmId === _id;
           const isOnline = onlineUsers.includes(_id);
@@ -144,9 +153,12 @@ const Connections = () => {
               <div className="p-4 flex flex-col flex-1">
                 <div className="flex items-start justify-between mb-2">
                   <div className="min-w-0">
-                    <h2 className="font-['Outfit'] font-bold text-[15px] text-white truncate">
-                      {firstName} {lastName}
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-['Outfit'] font-bold text-[15px] text-white truncate tracking-tight leading-tight">
+                        {firstName} {lastName}
+                      </h2>
+                      <MembershipBadge membershipType={membershipType} />
+                    </div>
                     {about && (
                       <p className="text-[12px] text-[#6b6880] line-clamp-2 mt-0.5">
                         {about}

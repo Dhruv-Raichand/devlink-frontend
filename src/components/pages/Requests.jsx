@@ -8,6 +8,7 @@ import ErrorMessage from "../ui/ErrorMessage";
 import { Link } from "react-router-dom";
 import InlineBanner from "../ui/Inlinebanner";
 import { useSearchParams } from "react-router-dom";
+import MembershipBadge from "../ui/MembershipBadge";
 
 const Requests = () => {
   const dispatch = useDispatch();
@@ -141,13 +142,22 @@ const Requests = () => {
     );
   };
 
-  const UserMeta = ({ to, state, firstName, lastName, age, gender, about }) => (
+  const UserMeta = ({
+    to,
+    state,
+    firstName,
+    lastName,
+    age,
+    gender,
+    about,
+    membershipType,
+  }) => (
     <div className="flex-1 min-w-0">
-      <Link
-        to={to}
-        state={state}
-        className="font-['Outfit'] font-bold text-[15px] text-white hover:text-violet-300 transition-colors no-underline">
-        {firstName} {lastName}
+      <Link to={to} state={state} className="flex items-center gap-2">
+        <h1 className="font-['Outfit'] font-bold text-[15px] text-white hover:text-violet-300 transition-colors no-underline">
+          {firstName} {lastName}
+        </h1>
+        <MembershipBadge membershipType={membershipType} />
       </Link>
       <div className="flex items-center gap-2 mt-0.5">
         {age && <span className="text-[11px] text-[#6b6880]">{age} y/o</span>}
@@ -221,6 +231,7 @@ const Requests = () => {
                   photoUrl,
                   age,
                   gender,
+                  membershipType,
                 } = request.fromUserId;
                 const isPending = processing.has(request._id);
                 const profileLink = `/app/profile/${_id}`;
@@ -246,6 +257,7 @@ const Requests = () => {
                         age={age}
                         gender={gender}
                         about={about}
+                        membershipType={membershipType}
                       />
                       <div className="flex gap-2 flex-shrink-0">
                         <button
