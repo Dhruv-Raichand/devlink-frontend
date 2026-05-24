@@ -1,4 +1,5 @@
 import { useState } from "react";
+import MembershipBadge from "./MembershipBadge";
 
 const UserCard = ({ user, sendRequest, disabled }) => {
   const [imageError, setImageError] = useState(false);
@@ -35,10 +36,12 @@ const UserCard = ({ user, sendRequest, disabled }) => {
 
       {/* Content */}
       <div className="p-5">
-        <h2 className="font-['Outfit'] font-bold text-[20px] text-white mb-1">
-          {user?.firstName} {user?.lastName}
-        </h2>
-
+        <div className="flex items-center gap-2">
+          <h2 className="font-['Outfit'] font-bold text-[20px] text-white mb-1 tracking-tight leading-tight">
+            {user?.firstName} {user?.lastName}
+          </h2>
+          <MembershipBadge membershipType={user?.membershipType} />
+        </div>
         {user?.gender && (
           <p className="text-[12px] text-[#6b6880] mb-3 capitalize">
             {user.gender}
