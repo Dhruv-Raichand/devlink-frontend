@@ -50,7 +50,7 @@ const Feed = () => {
       }
 
       const res = await api.get(`/user/feed?${params}`);
-      const newUsers = res.data?.data?.data ?? res.data?.data ?? [];
+      const newUsers = res.data?.data?.items ?? res.data?.data ?? [];
       const pagination = res.data?.data?.pagination ?? res.data?.pagination;
 
       dispatch(addFeed(newUsers));

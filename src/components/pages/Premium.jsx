@@ -207,10 +207,10 @@ function Premium() {
         billingCycle: billing.toUpperCase(),
       });
 
-      const { orderId, amount, currency } = order.data.data;
+      const { orderId, amount, currency, keyId } = order.data.data;
 
       const options = {
-        key: order.data.keyId,
+        key: keyId,
         amount,
         currency,
         name: "DevLink",
