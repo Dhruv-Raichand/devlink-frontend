@@ -20,7 +20,7 @@ const Login = () => {
 
   const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(
-    location.state?.mode !== "signup", // false = signup tab open
+    location.state?.mode !== "signup",
   );
 
   const dispatch = useDispatch();
@@ -31,7 +31,7 @@ const Login = () => {
     const toastId = toast.loading("Creating account...", baseConfig);
     setIsLoading(true);
     try {
-      const res = await api.post("/auth/signup", {
+      await api.post("/auth/signup", {
         firstName,
         lastName,
         emailId,
@@ -39,12 +39,13 @@ const Login = () => {
       });
 
       toast.update(toastId, {
-        render: "Account created 🎉",
+        render: "Account created! Please verify your email 📧",
         type: "success",
         isLoading: false,
         autoClose: 3000,
       });
-      dispatch(addUser(res?.data?.data));
+      sessionStorage.setItem("pendingVerificationEmail", emailId);
+      navigate("/verify-email", { state: { emailId } });
     } catch (err) {
       const { message, retryAfter: retryTime } = getErrorData(err);
       setRetryAfter(retryTime);
@@ -66,12 +67,21 @@ const Login = () => {
     setIsLoading(true);
     try {
       const res = await api.post("/auth/login", { emailId, password });
-      toast.update(toastId, {
-        render: "Welcome back 👋",
-        type: "success",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      if (res?.data?.data?.onboardingComplete === true) {
+        toast.update(toastId, {
+          render: "Welcome back 👋",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      } else {
+        toast.update(toastId, {
+          render: "Welcome to DevLink 👋",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      }
       dispatch(addUser(res?.data?.data));
       return navigate("/app");
     } catch (err) {

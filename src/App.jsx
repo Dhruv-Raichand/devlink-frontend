@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { Provider } from "react-redux";
 import appStore from "./store/appStore";
 import { ToastContainer, Flip } from "react-toastify";
@@ -20,11 +26,22 @@ import ProtectedRoute from "./components/layout/ProtectedRoutes";
 import Layout from "./components/layout/Layout";
 import Premium from "./components/pages/Premium";
 import VerifyEmail from "./components/pages/VerifyEmail";
+import { useEffect } from "react";
+import { setNavigator } from "./utils/navigate";
+
+function NavigationSetter() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    setNavigator(navigate);
+  }, [navigate]);
+  return null;
+}
 
 function App() {
   return (
     <Provider store={appStore}>
       <BrowserRouter basename="/">
+        <NavigationSetter />
         <ToastContainer
           position="top-right"
           autoClose={3000}

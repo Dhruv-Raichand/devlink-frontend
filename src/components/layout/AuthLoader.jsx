@@ -10,7 +10,7 @@ const AuthLoader = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const user = useSelector((state) => state.user);
   const [checking, setChecking] = useState(!user);
-  const [serverDown, setServerDown] = useState(false);
+  const [authFailed, setAuthFailed] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -22,8 +22,8 @@ const AuthLoader = ({ children }) => {
       .get("/profile")
       .then((res) => dispatch(addUser(res.data.data)))
       .catch((err) => {
-        if (err?.response?.status !== 401 && !err?.response) {
-          setServerDown(true);
+        if (!err?.response) {
+          setAuthFailed(true);
         }
       })
       .finally(() => setChecking(false));
@@ -44,7 +44,7 @@ const AuthLoader = ({ children }) => {
     );
   }
 
-  if (serverDown) {
+  if (authFailed) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
         <div className="text-center max-w-sm">
