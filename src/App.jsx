@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { Provider } from "react-redux";
 import appStore from "./store/appStore";
 import { ToastContainer, Flip } from "react-toastify";
@@ -20,11 +26,22 @@ import ProtectedRoute from "./components/layout/ProtectedRoutes";
 import Layout from "./components/layout/Layout";
 import Premium from "./components/pages/Premium";
 import VerifyEmail from "./components/pages/VerifyEmail";
+import { useEffect } from "react";
+import { setNavigator } from "./utils/navigate";
+
+function NavigationSetter() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    setNavigator(navigate);
+  }, [navigate]);
+  return null;
+}
 
 function App() {
   return (
     <Provider store={appStore}>
       <BrowserRouter basename="/">
+        <NavigationSetter />
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -36,59 +53,57 @@ function App() {
           theme="dark"
           transition={Flip}
         />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <PublicRoute>
-                <Landing />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route path="/verify-email" element={<VerifyEmail />} />
+        <AuthLoader>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <PublicRoute>
+                  <Landing />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
-          {/* Onboarding — protected but outside Layout (no navbar) */}
-          <Route
-            path="/app/onboarding"
-            element={
-              <AuthLoader>
+            {/* Onboarding — protected but outside Layout (no navbar) */}
+            <Route
+              path="/app/onboarding"
+              element={
                 <ProtectedRoute>
                   <Onboarding />
                 </ProtectedRoute>
-              </AuthLoader>
-            }
-          />
+              }
+            />
 
-          {/* Main app */}
-          <Route
-            path="/app"
-            element={
-              <AuthLoader>
+            {/* Main app */}
+            <Route
+              path="/app"
+              element={
                 <ProtectedRoute>
                   <Layout />
                 </ProtectedRoute>
-              </AuthLoader>
-            }>
-            <Route index element={<Feed />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="connections" element={<Connections />} />
-            <Route path="requests" element={<Requests />} />
-            <Route path="messages" element={<ChatInbox />} />
-            <Route path="messages/:targetUserId" element={<Chat />} />
-            <Route path="profile/:userId" element={<ViewProfile />} />
-            <Route path="premium" element={<Premium />} />
-          </Route>
+              }>
+              <Route index element={<Feed />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="connections" element={<Connections />} />
+              <Route path="requests" element={<Requests />} />
+              <Route path="messages" element={<ChatInbox />} />
+              <Route path="messages/:targetUserId" element={<Chat />} />
+              <Route path="profile/:userId" element={<ViewProfile />} />
+              <Route path="premium" element={<Premium />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthLoader>
       </BrowserRouter>
     </Provider>
   );

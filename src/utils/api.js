@@ -1,10 +1,19 @@
 import axios from "axios";
 import { BASE_URL } from "./constants";
+import { navigateTo } from "./navigate";
 
 const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
 });
+
+let store;
+const getStore = async () => {
+  if (!store) {
+    store = (await import("../store/appStore")).default;
+  }
+  return store;
+};
 
 api.interceptors.response.use(
   (response) => response,
@@ -14,7 +23,7 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url !== "/auth/refresh"
+      !originalRequest.url?.includes("/auth/refresh")
     ) {
       originalRequest._retry = true;
 
@@ -22,7 +31,10 @@ api.interceptors.response.use(
         await api.post("/auth/refresh");
         return api(originalRequest);
       } catch (refreshError) {
-        window.location.href = "/login";
+        const s = await getStore();
+        const { removeUser } = await import("../store/userSlice");
+        s.dispatch(removeUser());
+        navigateTo("/login");
         return Promise.reject(refreshError);
       }
     }

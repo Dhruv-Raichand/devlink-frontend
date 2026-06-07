@@ -1,4 +1,3 @@
-// ProtectedRoutes.jsx
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import { isOnboardingComplete } from "../../hooks/useOnboarding";
