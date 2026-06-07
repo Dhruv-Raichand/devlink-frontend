@@ -36,57 +36,59 @@ function App() {
           theme="dark"
           transition={Flip}
         />
-        <AuthLoader>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <PublicRoute>
-                  <Landing />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
-            <Route path="/verify-email" element={<VerifyEmail />} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <Landing />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
-            {/* Onboarding — protected but outside Layout (no navbar) */}
-            <Route
-              path="/app/onboarding"
-              element={
+          {/* Onboarding — protected but outside Layout (no navbar) */}
+          <Route
+            path="/app/onboarding"
+            element={
+              <AuthLoader>
                 <ProtectedRoute>
                   <Onboarding />
                 </ProtectedRoute>
-              }
-            />
+              </AuthLoader>
+            }
+          />
 
-            {/* Main app */}
-            <Route
-              path="/app"
-              element={
+          {/* Main app */}
+          <Route
+            path="/app"
+            element={
+              <AuthLoader>
                 <ProtectedRoute>
                   <Layout />
                 </ProtectedRoute>
-              }>
-              <Route index element={<Feed />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="connections" element={<Connections />} />
-              <Route path="requests" element={<Requests />} />
-              <Route path="messages" element={<ChatInbox />} />
-              <Route path="messages/:targetUserId" element={<Chat />} />
-              <Route path="profile/:userId" element={<ViewProfile />} />
-              <Route path="premium" element={<Premium />} />
-            </Route>
+              </AuthLoader>
+            }>
+            <Route index element={<Feed />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="connections" element={<Connections />} />
+            <Route path="requests" element={<Requests />} />
+            <Route path="messages" element={<ChatInbox />} />
+            <Route path="messages/:targetUserId" element={<Chat />} />
+            <Route path="profile/:userId" element={<ViewProfile />} />
+            <Route path="premium" element={<Premium />} />
+          </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthLoader>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </Provider>
   );

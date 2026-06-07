@@ -22,7 +22,7 @@ const AuthLoader = ({ children }) => {
       .get("/profile")
       .then((res) => dispatch(addUser(res.data.data)))
       .catch((err) => {
-        if (err?.response?.status !== 401 && !err?.response) {
+        if (err?.response) {
           setServerDown(true);
         }
       })
