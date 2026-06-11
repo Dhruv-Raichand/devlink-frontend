@@ -14,21 +14,31 @@ React frontend for a developer discovery and networking platform. Swipe-based pr
 
 ## Tech stack
 
-|           |                     |
-| --------- | ------------------- |
-| Framework | React 19 + Vite     |
-| Styling   | Tailwind CSS v4     |
-| State     | Redux Toolkit       |
-| Routing   | React Router v7     |
-| Real-time | Socket.io client    |
-| HTTP      | Axios (cookie auth) |
-| Payments  | Razorpay            |
+|           |                                   |
+| --------- | --------------------------------- |
+| Framework | React 19 + Vite                   |
+| Styling   | Tailwind CSS v4                   |
+| State     | Redux Toolkit                     |
+| Routing   | React Router v7                   |
+| Real-time | Socket.io client                  |
+| HTTP      | Axios (interceptor + cookie auth) |
+| Payments  | Razorpay                          |
+
+---
+
+## Auth flow
+
+New users complete a four-step flow: register → verify email → login → onboarding. After login, the server issues access (15m) + refresh (30d) tokens in httpOnly cookies. The Axios interceptor handles silent token refresh automatically — on a 401, it calls `/auth/refresh` and retries the original request once before redirecting to `/login`.
 
 ---
 
 ## Features
 
 **Swipe feed** — draggable card stack with green/red overlay on drag. Fetches 5 profiles at a time, auto-fetches more when ≤ 2 cards remain. Skill-based filtering via `?skills=React,Node.js`. Pagination uses refs (`pageRef`, `isFetchingRef`, `hasMoreRef`) to avoid stale-closure re-render loops.
+
+**Axios interceptor** — all API calls use a shared `api.js` instance. On a 401 response, the interceptor automatically attempts a token refresh via `/auth/refresh` and retries the original request once. If refresh fails, redirects to `/login`. Prevents manual token handling in every component.
+
+**Offline / server error handling** — `AuthLoader` distinguishes between auth failure (401, handled by interceptor) and network failure (no response). Shows a "Can't reach the server" screen with a retry button on network errors instead of silently failing or redirecting to login.
 
 **Real-time notifications** — Socket.io listener in `Layout.jsx` dispatches to Redux on `newNotification`. NavBar badge counts are derived via `useMemo` and clear automatically when the user visits the relevant page.
 
@@ -38,9 +48,11 @@ React frontend for a developer discovery and networking platform. Swipe-based pr
 
 **Real-time chat** — Socket.io room per conversation pair (deterministic hash). Messages persisted to MongoDB and fetched on mount.
 
-**Onboarding** — 4-step full-page flow on first signup. Skill chips, custom gender pills (no native `<select>`), GitHub username. Completion flag in `localStorage`.
+**Email verification** — `/verify-email` page handles the token from query params. On success, redirects to `/app` with `?verified=true`; `AuthLoader` detects the flag, shows a toast, and clears the param.
 
-**Premium** — Razorpay order integration with payment polling.
+**Onboarding** — 4-step full-page flow on first login for new users. Skill chips, custom gender pills (no native `<select>`), GitHub username. Completion tracked via `onboardingComplete` on the user document.
+
+**Premium** — Razorpay order creation and client-side payment verification. Membership badge displayed on profile cards and profile pages based on `membershipType` from user state.
 
 **GitHub integration** — fetches `api.github.com/users/:username` on profile pages. Shows repos, followers, bio.
 
@@ -83,19 +95,20 @@ User visits /app/requests              → dispatch(clearByType("request"))
 
 ## Routes
 
-| Path                          | Page                            |
-| ----------------------------- | ------------------------------- |
-| `/`                           | Landing                         |
-| `/login`                      | Login / signup (tab toggle)     |
-| `/app`                        | Feed                            |
-| `/app/onboarding`             | Onboarding (4 steps)            |
-| `/app/connections`            | Connections grid                |
-| `/app/requests`               | Requests (tab persisted in URL) |
-| `/app/messages`               | Chat inbox                      |
-| `/app/messages/:targetUserId` | Conversation                    |
-| `/app/profile`                | Own profile + edit              |
-| `/app/profile/:userId`        | Other user's profile            |
-| `/app/premium`                | Pricing + payment               |
+| Path                          | Page                                        |
+| ----------------------------- | ------------------------------------------- |
+| `/`                           | Landing                                     |
+| `/login`                      | Login / signup                              |
+| `/verify-email`               | Email verification (token from query param) |
+| `/app`                        | Feed                                        |
+| `/app/onboarding`             | Onboarding (4 steps)                        |
+| `/app/connections`            | Connections grid                            |
+| `/app/requests`               | Requests (tab persisted in URL)             |
+| `/app/messages`               | Chat inbox                                  |
+| `/app/messages/:targetUserId` | Conversation                                |
+| `/app/profile`                | Own profile + edit                          |
+| `/app/profile/:userId`        | Other user's profile                        |
+| `/app/premium`                | Pricing + payment                           |
 
 ---
 
