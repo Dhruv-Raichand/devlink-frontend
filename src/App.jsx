@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import appStore from "./store/appStore";
 import { ToastContainer, Flip } from "react-toastify";
 
-import Landing from "./components/pages/Landing";
+import Landing from "./components/pages/landing/Landing";
 import Login from "./components/pages/Login";
 import Profile from "./components/pages/Profile";
 import Connections from "./components/pages/Connections";
