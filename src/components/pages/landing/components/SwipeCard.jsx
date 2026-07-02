@@ -1,21 +1,48 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
-const ProfilePhoto = ({ compact = false, src, role }) => (
-  <div className="absolute inset-0 bg-[#1a1928]">
-    <img
-      src={src}
-      alt=""
-      className="absolute inset-0 w-full h-full object-cover"
-      loading="lazy"
-    />
-    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#13121c]/95 via-[#13121c]/35 to-transparent" />
-    {!compact && (
-      <div className="absolute left-4 top-4 rounded-full border border-[#2d2b40] bg-[#13121c]/85 px-3 py-1 text-[11px] text-[#9b8ec4]">
-        {role}
-      </div>
-    )}
-  </div>
-);
+const initials = (first, last) =>
+  `${first?.[0] ?? ""}${last?.[0] ?? ""}`.toUpperCase();
+
+const ProfilePhoto = ({ compact = false, src, role, firstName, lastName }) => {
+  const imgRef = useRef(null);
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, [src]);
+
+  return (
+    <div className="absolute inset-0 bg-[#1a1928]">
+      {!failed ?
+        <img
+          src={src}
+          alt=""
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+          loading="lazy"
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
+      : <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_50%_30%,#4c1d95_0%,#1a1928_70%)]">
+          <span className="font-['Outfit'] font-bold text-white/80 text-[42px] tracking-wide">
+            {initials(firstName, lastName)}
+          </span>
+        </div>
+      }
+      {!loaded && !failed && (
+        <div className="absolute inset-0 bg-[#1a1928] animate-pulse" />
+      )}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#13121c]/95 via-[#13121c]/35 to-transparent" />
+      {!compact && (
+        <div className="absolute left-4 top-4 rounded-full border border-[#2d2b40] bg-[#13121c]/85 px-3 py-1 text-[11px] text-[#9b8ec4]">
+          {role}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SwipeCardPreview = ({
   profile,
@@ -61,6 +88,8 @@ const SwipeCardPreview = ({
           compact={compact}
           src={profile?.photo}
           role={profile?.role}
+          firstName={profile?.firstName}
+          lastName={profile?.lastName}
         />
         <div className="absolute top-3 right-3 bg-[#13121c]/90 border border-[#2d2b40] text-[#e8e6f0] px-2.5 py-1 rounded-full text-[12px] font-medium">
           {profile?.age}
