@@ -1,6 +1,5 @@
 import axios from "axios";
 import { BASE_URL } from "./constants";
-import { navigateTo } from "./navigate";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -34,7 +33,6 @@ api.interceptors.response.use(
         const s = await getStore();
         const { removeUser } = await import("../store/userSlice");
         s.dispatch(removeUser());
-        navigateTo("/login");
         return Promise.reject(refreshError);
       }
     }
