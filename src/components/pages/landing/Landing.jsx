@@ -5,9 +5,9 @@ import NavBar from "../../layout/NavBar";
 import Footer from "../../layout/Footer";
 import { SKILLS } from "./data";
 import Stats from "./components/Stats";
-import Hero from "./Hero";
-import Pricing from "./Pricing";
-import Features from "./Features";
+import Hero from "./sections/Hero";
+import Pricing from "./sections/Pricing";
+import Features from "./sections/Features";
 import Reveal from "./components/Reveal";
 
 export default function Landing() {
