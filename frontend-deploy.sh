@@ -1,26 +1,24 @@
 #!/bin/bash
 set -e
 
-# Load nvm
-export NVM_DIR="$HOME/.nvm"
-source "$NVM_DIR/nvm.sh"
+RELEASE_DIR="/var/www/frontend/releases/$(date +%Y%m%d-%H%M%S)"
+CURRENT_LINK="/var/www/frontend/current"
+KEEP_RELEASES=5
 
-# Use your node version
-nvm use node
+echo "Creating release directory..."
+mkdir -p "$RELEASE_DIR"
 
-cd ~/devlink-frontend
+echo "Extracting build..."
+tar -xzf /tmp/frontend.tar.gz -C "$RELEASE_DIR"
 
-echo "Pulling latest code..."
-git pull origin main
+echo "Switching symlink..."
+ln -sfn "$RELEASE_DIR" "$CURRENT_LINK"
 
-echo "Installing dependencies..."
-npm install
+echo "Cleaning old releases..."
+cd /var/www/frontend/releases
+ls -1t | tail -n +$((KEEP_RELEASES + 1)) | xargs -r rm -rf
 
-echo "Building project..."
-npm run build
-
-echo "Deploying to Nginx..."
-rm -rf /var/www/html/*
-cp -r dist/* /var/www/html
+echo "Cleaning up artifact..."
+rm -f /tmp/frontend.tar.gz
 
 echo "Frontend deployed!"
