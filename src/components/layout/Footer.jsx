@@ -30,7 +30,7 @@ const SOCIAL_LINKS = [
 
 const Footer = () => {
   return (
-    <footer className="border-t border-[#1e1d28] bg-[#0d0c16] px-6 md:px-10 py-5">
+    <footer className="border-t border-white/[0.06] bg-[#0d0c16]/70 backdrop-blur-xl px-6 md:px-10 py-5">
       <div className="flex items-center justify-between flex-wrap gap-4">
         {/* Left — logo + copyright */}
         <div className="flex items-center gap-2">

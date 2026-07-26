@@ -83,8 +83,8 @@ const NavBar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-[#0a0a0f]/90 backdrop-blur-md border-b border-[#1e1d28]">
-      <div className="flex items-center justify-between px-6 md:px-10 h-14 py-8">
+    <nav className="sticky top-0 z-50 w-full bg-[#0d0c16]/60 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_1px_0_0_rgba(255,255,255,0.03)]">
+      <div className="flex items-center justify-between px-6 md:px-10 py-3">
         {/* ── Logo ── */}
         <Link
           to={user ? "/app" : "/"}
@@ -134,11 +134,11 @@ const NavBar = () => {
           </button>
         )}
 
-        {/* ── Authenticated: desktop nav + profile ── */}
+        {/* ── Authenticated: desktop nav ── */}
         {user && (
           <>
             {/* Desktop links */}
-            <ul className="hidden md:flex items-center gap-2 list-none m-0 p-0">
+            <ul className="hidden md:flex items-center gap-1 list-none m-0 p-0">
               {NAV_LINKS.map((link) => (
                 <li key={link.to}>
                   <Link
@@ -149,17 +149,25 @@ const NavBar = () => {
                       : "text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c]"
                     }`}>
                     {link.label}
-                    {link.to === location.pathname ? null : (
-                      link.count > 0 && (
-                        <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                          {link.count > 99 ? "99+" : link.count}
-                        </span>
-                      )
+
+                    {/* active-tab underline */}
+                    {isActive(link.to) && (
+                      <span className="absolute left-3.5 right-3.5 -bottom-[1px] h-[2px] bg-violet-500 rounded-full" />
+                    )}
+
+                    {/* notification badge, hidden on the page you're already viewing */}
+                    {!isActive(link.to) && link.count > 0 && (
+                      <span className="absolute -top-1 -right-1.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 bg-red-500 text-white text-[10px] font-semibold rounded-full leading-none">
+                        {link.count > 99 ? "99+" : link.count}
+                      </span>
                     )}
                   </Link>
                 </li>
               ))}
             </ul>
+
+            {/* single divider between nav links and profile cluster */}
+            <div className="hidden md:block w-px h-6 bg-[#1e1d28] mx-3" />
 
             {/* Desktop profile dropdown */}
             <div
@@ -273,7 +281,7 @@ const NavBar = () => {
 
       {/* ── Mobile menu (auth only) ── */}
       {user && mobileMenuOpen && (
-        <div className="md:hidden border-t border-[#1e1d28] bg-[#0d0c16] px-4 py-3">
+        <div className="absolute right-0 mt-2 w-56 bg-[#13121c]/80 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-50">
           {/* User info */}
           <div className="flex items-center gap-3 px-2 py-3 mb-2 border-b border-[#1e1d28]">
             <img
