@@ -1,5 +1,7 @@
 export const BASE_URL =
-  location.hostname === "localhost" ? "http://localhost:3000" : "/api";
+  location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : import.meta.env.VITE_API_URL;
 
 export const BADGE = {
   FREE: null,
