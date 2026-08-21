@@ -4,6 +4,7 @@ import api from "../../utils/api";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorMessage from "../ui/ErrorMessage";
 import MembershipBadge from "../ui/MembershipBadge";
+import { GitHubCalendar } from "react-github-calendar";
 
 const GitHubIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -22,6 +23,7 @@ const ViewProfile = () => {
   const [imageError, setImageError] = useState(false);
   const [github, setGithub] = useState(null);
   const [githubLoading, setGithubLoading] = useState(false);
+  const [contributions, setContributions] = useState(null);
 
   useEffect(() => {
     if (location.state?.targetUser) {
@@ -51,6 +53,18 @@ const ViewProfile = () => {
       .finally(() => setGithubLoading(false));
   }, [user]);
 
+  useEffect(() => {
+    if (!user?.githubUsername) return;
+    fetch(
+      `https://github-contributions-api.jogruber.de/v4/${user.githubUsername}`,
+    )
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.error) setContributions(data);
+      })
+      .catch(() => {});
+  }, [user]);
+
   if (loading) return <LoadingSpinner message="Loading profile..." />;
   if (error) return <ErrorMessage message={error} />;
   if (!user) return null;
@@ -65,7 +79,7 @@ const ViewProfile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pt-8 pb-20">
+    <div className="max-w-4xl mx-auto px-4 pt-8 pb-20">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
@@ -267,6 +281,44 @@ const ViewProfile = () => {
                         {github.location}
                       </div>
                     )}
+                  </div>
+
+                  {/* Contribution graph */}
+                  <div className="mt-4 pt-4 border-t border-[#1e1d28]">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-[11px] text-[#4a4760] uppercase tracking-wider">
+                        Contributions
+                      </p>
+                      {contributions?.total?.[new Date().getFullYear()] !=
+                        null && (
+                        <p className="text-[12px] text-[#9b8ec4]">
+                          <span className="text-white font-semibold">
+                            {contributions.total[new Date().getFullYear()]}
+                          </span>{" "}
+                          in {new Date().getFullYear()}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex justify-center items-center overflow-x-auto text-white">
+                      <GitHubCalendar
+                        username={user.githubUsername}
+                        colorScheme="dark"
+                        theme={{
+                          dark: [
+                            "#13121c",
+                            "#2d1f4a",
+                            "#4c2f8f",
+                            "#6d28d9",
+                            "#a78bfa",
+                          ],
+                        }}
+                        fontSize={12}
+                        blockSize={11}
+                        blockMargin={3}
+                        showWeekdayLabels={true}
+                        hideTotalCount={true}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
