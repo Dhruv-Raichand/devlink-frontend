@@ -136,7 +136,7 @@ const NavBar = () => {
 
         {/* ── Authenticated: desktop nav ── */}
         {user && (
-          <>
+          <div className="flex items-center">
             {/* Desktop links */}
             <ul className="hidden md:flex items-center gap-1 list-none m-0 p-0">
               {NAV_LINKS.map((link) => (
@@ -275,70 +275,72 @@ const NavBar = () => {
                 }
               </svg>
             </button>
-          </>
+          </div>
         )}
       </div>
 
       {/* ── Mobile menu (auth only) ── */}
       {user && mobileMenuOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-[#13121c]/80 backdrop-blur-xl border border-white/[0.08] rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-50">
-          {/* User info */}
-          <div className="flex items-center gap-3 px-2 py-3 mb-2 border-b border-[#1e1d28]">
-            <img
-              src={user.photoUrl}
-              alt={user.firstName}
-              className="w-9 h-9 rounded-full object-cover border border-[#2d2b40]"
-              onError={(e) => {
-                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  user.firstName + " " + user.lastName,
-                )}&background=6d28d9&color=fff`;
-              }}
-            />
-            <div className="min-w-0">
-              <p className="text-[13px] font-medium text-[#e8e6f0] truncate">
-                {user.firstName} {user.lastName}
-              </p>
-              <p className="text-[11px] text-[#4a4760] truncate">
-                {user.emailId}
-              </p>
+        <div className="absolute top-full left-0 right-0 md:hidden bg-[#0d0c16]/95 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl shadow-black/50 z-50">
+          <div className="px-6 py-4">
+            {/* User info */}
+            <div className="flex items-center gap-3 px-2 py-3 mb-2 border-b border-[#1e1d28]">
+              <img
+                src={user.photoUrl}
+                alt={user.firstName}
+                className="w-9 h-9 rounded-full object-cover border border-[#2d2b40]"
+                onError={(e) => {
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    user.firstName + " " + user.lastName,
+                  )}&background=6d28d9&color=fff`;
+                }}
+              />
+              <div className="min-w-0">
+                <p className="text-[13px] font-medium text-[#e8e6f0] truncate">
+                  {user.firstName} {user.lastName}
+                </p>
+                <p className="text-[11px] text-[#4a4760] truncate">
+                  {user.emailId}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Nav links */}
-          <nav className="flex flex-col gap-0.5 mb-2">
-            {NAV_LINKS.map((link) => (
+            {/* Nav links */}
+            <nav className="flex flex-col gap-0.5 mb-2">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`relative px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors no-underline ${
+                    isActive(link.to) ?
+                      "text-white bg-[#1a1928]"
+                    : "text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c]"
+                  }`}>
+                  {link.label}
+                  {link.to === location.pathname ? null : (
+                    link.count > 0 && (
+                      <span className="absolute right-3 top-2  bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                        {link.count > 99 ? "99+" : link.count}
+                      </span>
+                    )
+                  )}
+                </Link>
+              ))}
               <Link
-                key={link.to}
-                to={link.to}
-                className={`relative px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors no-underline ${
-                  isActive(link.to) ?
-                    "text-white bg-[#1a1928]"
-                  : "text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c]"
-                }`}>
-                {link.label}
-                {link.to === location.pathname ? null : (
-                  link.count > 0 && (
-                    <span className="absolute right-3 top-2  bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                      {link.count > 99 ? "99+" : link.count}
-                    </span>
-                  )
-                )}
+                to="/app/profile"
+                className="px-3 py-2.5 rounded-lg text-[13px] font-medium text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c] transition-colors no-underline">
+                Profile
               </Link>
-            ))}
-            <Link
-              to="/app/profile"
-              className="px-3 py-2.5 rounded-lg text-[13px] font-medium text-[#6b6880] hover:text-[#e8e6f0] hover:bg-[#13121c] transition-colors no-underline">
-              Profile
-            </Link>
-          </nav>
+            </nav>
 
-          {/* Logout */}
-          <div className="border-t border-[#1e1d28] pt-2">
-            <button
-              onClick={handleLogout}
-              className="w-full px-3 py-2.5 rounded-lg text-[13px] text-red-400 hover:text-red-300 hover:bg-red-950/30 transition-colors cursor-pointer bg-transparent border-none text-left">
-              Sign out
-            </button>
+            {/* Logout */}
+            <div className="border-t border-[#1e1d28] pt-2">
+              <button
+                onClick={handleLogout}
+                className="w-full px-3 py-2.5 rounded-lg text-[13px] text-red-400 hover:text-red-300 hover:bg-red-950/30 transition-colors cursor-pointer bg-transparent border-none text-left">
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       )}
